@@ -25,7 +25,7 @@ struct Optix_Person_Tracker_for_Homes_iOSApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LoginView()
         }
         .modelContainer(sharedModelContainer)
     }
