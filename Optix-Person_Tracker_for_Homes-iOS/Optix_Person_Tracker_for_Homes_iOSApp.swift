@@ -10,23 +10,17 @@ import SwiftData
 
 @main
 struct Optix_Person_Tracker_for_Homes_iOSApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
+    
+    @StateObject var session = SessionManager.shared
+    
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            if session.isLoggedIn {
+                DashboardView()
+            }
+            else{
+                LoginView()
+            }
         }
-        .modelContainer(sharedModelContainer)
     }
 }

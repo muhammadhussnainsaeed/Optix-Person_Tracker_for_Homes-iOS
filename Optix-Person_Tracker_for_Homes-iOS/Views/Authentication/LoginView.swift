@@ -10,12 +10,17 @@ import SwiftUI
 struct LoginView: View {
     @State var username: String = ""
     @State var password: String = ""
-    @State var isSignUpTapped: Bool = false
-    @State var isForgotTapped: Bool = false
+    @State var conditionOfError: Bool = false
+    @State var messageOfError: String = ""
     
+    //var AuthViewModelObject = AuthViewModel()
+    
+    @StateObject private var authViewModelObject = AuthViewModel()
     var body: some View {
-        NavigationStack() {
+        NavigationStack(path: $authViewModelObject.navPath) {
             VStack(alignment: .leading) {
+                
+                //Top Headings
                 HStack {
                     Text("Log In to your Account")
                         .bold()
@@ -28,22 +33,24 @@ struct LoginView: View {
                         .font(.subheadline)
                 }
                 .padding(.bottom, 60)
-
+                
+                //Username TextField
                 Text("Username:")
                     .bold()
                     .padding(.horizontal, 14)
                 TextField("Enter your username", text: $username)
-                    .textCase(.lowercase)
+                    .textInputAutocapitalization(.never)
                     .padding()
                     .frame(height: 50)
                     .glassEffect() // Assuming you have this extension
                     .padding(.bottom, 30)
                 
+                //Password Text Field
                 Text("Password:")
                     .bold()
                     .padding(.horizontal, 14)
                 SecureField("Enter your password", text: $password)
-                    .textCase(.lowercase)
+                    .textInputAutocapitalization(.never)
                     .padding()
                     .frame(height: 50)
                     .glassEffect()
@@ -54,33 +61,31 @@ struct LoginView: View {
                     
                     Button {
                         print("")
-                        isForgotTapped = true
+                        authViewModelObject.navPath.append(AuthRoute.forgetPassword)
                     } label: {
                         Text("Trouble signing in? Recover now!")
                             .font(.footnote)
-                            .foregroundColor(Color("custom_blue"))
+                            .foregroundColor(.primary)
                     }
                     Spacer()
                 }
                 
                 .padding(.bottom, 170)
                 
-                // ... (Your existing Sign In Button) ...
                 HStack(alignment: .center) {
-                    Button {
-                        print("Sign In Action")
-                    } label: {
-                        Text("Sign In")
-                            .bold()
-                            .font(.headline)
-                            .foregroundStyle(.black) // Text color on button
-                            .padding(.vertical, 18)
-                            .padding(.horizontal, 16)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .background(Color("custom_yellow"))
-                    .clipShape(Capsule())
-                    .glassEffect()
+                    
+                    PrimaryButton(buttonText: "Sign in", buttonTextColor: .black, buttonColor: "custom_yellow", action: {
+                        if username == "" || password == "" {
+                            messageOfError = "We need your info to get you in!"
+                            conditionOfError = true
+                            return
+                        }
+                        await authViewModelObject.loginUser(username: username, password: password)
+                        if authViewModelObject.errorMessage != nil {
+                            messageOfError = authViewModelObject.errorMessage!
+                            conditionOfError = true
+                        }
+                    }, isLoading: authViewModelObject.isLoading)
                     .padding(.bottom, 20)
                 }
                 HStack(){
@@ -88,10 +93,10 @@ struct LoginView: View {
                     
                     Button {
                         print("press signup button")
-                        isSignUpTapped = true
-
+                        authViewModelObject.navPath.append(AuthRoute.signup)
+                        
                     } label: {
-                        Text("Doesn't have a account? Sign up")
+                        Text("Don't have an account? Sign up")
                             .font(.footnote)
                             .foregroundColor(Color.primary)
                     }
@@ -99,18 +104,28 @@ struct LoginView: View {
                 }
                 Spacer()
             }
+            .navigationDestination(for: AuthRoute.self) { route in
+                switch route {
+                case .signup:
+                    SignupView() // Step 1 View
+                case .signupQuestion:
+                    SignupQuestionView() // Step 2 View
+                case .forgetPassword:
+                    ForgetView()
+                case .newPassword:
+                    ForgotNewPasswordView()
+                }
+            }
+            .alert(messageOfError, isPresented: $conditionOfError, actions: {
+                Button("Ok", role: .cancel){
+                    conditionOfError = false
+                }
+            })
             .padding(.all, 30)
-            .navigationDestination(isPresented: $isSignUpTapped) {
-                            SignupView()
-                        }
-            .navigationDestination(isPresented: $isForgotTapped) {
-                            ForgetView()
-                        }
         }
-        .navigationBarBackButtonHidden()
+        .environmentObject(authViewModelObject)
     }
 }
-
 #Preview {
     LoginView()
 }
