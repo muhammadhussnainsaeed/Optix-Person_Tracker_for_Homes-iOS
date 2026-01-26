@@ -10,8 +10,6 @@ import Foundation
 class AuthService{
     
     private let Network = NetworkManager()
-    var user: User?
-    
     
     func login(username: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
         
@@ -189,36 +187,4 @@ class AuthService{
             }
         }
     }
-    
-//    func Signup1(name: String, username: String, password: String,security_question: String,security_answer: String, completion: @escaping (Result<User, Error>) -> Void) {
-//        let credentials = ["name": name,"username": username, "password": password, "security_question": security_question,"security_answer": security_answer]
-//        
-//        // 2. Perform the request
-//        Network.request(url: "/auth/sign_up", method: "post", body: credentials) { data, error in
-//            
-//            // 3. Handle Network Error
-//            if let error = error {
-//                print("Login failed: \(error)")
-//                completion(.failure(error))
-//                return
-//            }
-//            
-//            // 4. Handle Data Decoding
-//            guard let data = data else {
-//                // Create a custom error if data is missing
-//                let noDataError = NSError(domain: "Auth", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
-//                completion(.failure(noDataError))
-//                return
-//            }
-//            
-//            do {
-//                let decoder = JSONDecoder()
-//                let user = try decoder.decode(User.self, from: data)
-//                completion(.success(user))
-//            } catch {
-//                print("Decoding failed: \(error)")
-//                completion(.failure(error))
-//            }
-//        }
-//    }
 }

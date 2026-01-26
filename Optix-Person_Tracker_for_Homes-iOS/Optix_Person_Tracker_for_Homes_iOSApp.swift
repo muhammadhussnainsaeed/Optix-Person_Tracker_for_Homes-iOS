@@ -16,7 +16,8 @@ struct Optix_Person_Tracker_for_Homes_iOSApp: App {
     var body: some Scene {
         WindowGroup {
             if session.isLoggedIn {
-                DashboardView()
+                MainTabView()
+                    .modelContainer(for: [DashboardCache.self, RecentLogSD.self, ObjectInterationSD.self])
             }
             else{
                 LoginView()

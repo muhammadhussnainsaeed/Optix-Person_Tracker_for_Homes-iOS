@@ -55,7 +55,7 @@ class SessionManager: ObservableObject {
     // MARK: 5, The Token (Keychain Logic)
     func saveAuthToken(token: String) {
         let data = Data(token.utf8)
-        KeychainHelper.standard.save(data, service: "com.optix.app", account: "authToken")
+        KeychainHelper.standard.save(data, service: "optix.Optix-Person-Tracker-for-Homes-iOS", account: "authToken")
         
         // This triggers the UI update because 'isLoggedIn' is @Published
         self.isLoggedIn = true
