@@ -16,6 +16,7 @@ struct LoginView: View {
     //var AuthViewModelObject = AuthViewModel()
     
     @StateObject private var authViewModelObject = AuthViewModel()
+    
     var body: some View {
         NavigationStack(path: $authViewModelObject.navPath) {
             VStack(alignment: .leading) {

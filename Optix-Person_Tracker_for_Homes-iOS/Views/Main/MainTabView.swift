@@ -27,8 +27,6 @@ struct MainTabView: View {
             // TAB 2: CCTV 
             NavigationStack {
                 CCTVView()
-//                CCTVView()
-//                    .navigationTitle("Live Monitor")
             }
             .tag(AppTab.cctv)
             .tabItem {
@@ -38,8 +36,6 @@ struct MainTabView: View {
             // TAB 3: FAMILY
             NavigationStack {
                 Text("Family")
-//                FamilyListView()
-//                    .navigationTitle("Trusted Members")
             }
             .tag(AppTab.family)
             .tabItem {
@@ -49,8 +45,6 @@ struct MainTabView: View {
             // TAB 4: ALERTS
             NavigationStack {
                 Text("Alerts")
-//                AlertsListView()
-//                    .navigationTitle("Security Alerts")
             }
             .tag(AppTab.alerts)
             .tabItem {
@@ -64,10 +58,6 @@ struct MainTabView: View {
                 } label: {
                     Text("Logout")
                 }
-
-//                Text("Alerts")
-//                SettingsView()
-//                    .navigationTitle("Settings")
             }
             .tag(AppTab.settings)
             .tabItem {

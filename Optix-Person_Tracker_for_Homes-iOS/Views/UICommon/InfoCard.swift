@@ -103,10 +103,11 @@ struct InfoCard: View {
                 } label: {
                     HStack{
                         VStack{
-                            Rectangle()
+                            Image("camera")
+                                .resizable()
+                                .scaledToFit()
                                 .frame(width: 60, height: 60)
                                 .cornerRadius(13)
-                                .foregroundStyle(Color.primary)
                         }
                         VStack{
                             HStack{
@@ -123,6 +124,7 @@ struct InfoCard: View {
                                     .lineLimit(2)
                                     .multilineTextAlignment(.leading)
                                     .fixedSize(horizontal: false, vertical: true)
+                                Spacer()
                                 //Text("\(description)")
                             }
                         }
@@ -147,15 +149,15 @@ struct InfoCard: View {
                     } label: {
                         HStack{
                             VStack{
-                                Rectangle()
+                                Image("floor_plan")
+                                    .resizable()
+                                    .scaledToFit()
                                     .frame(width: 60, height: 60)
                                     .cornerRadius(13)
-                                    //.background(Color.primary)
-                                    .foregroundStyle(Color.primary)
                             }
                             VStack{
                                 HStack{
-                                    Text("\(Text("Title: ").fontWeight(.bold))\(name)")
+                                    Text("\(Text("Title: ").fontWeight(.bold))\(floorName)")
                                         .font(.caption)
                                         .foregroundColor(cardType.textColor)
                                     Spacer()
@@ -168,7 +170,7 @@ struct InfoCard: View {
                                         .lineLimit(2)
                                         .multilineTextAlignment(.leading)
                                         .fixedSize(horizontal: false, vertical: true)
-                                    //Text("\(description)")
+                                    Spacer()
                                 }
                             }
                             .padding(.horizontal, 10)

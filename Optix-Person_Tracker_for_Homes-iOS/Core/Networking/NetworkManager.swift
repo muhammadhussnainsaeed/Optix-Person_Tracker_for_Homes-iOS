@@ -44,33 +44,33 @@ class NetworkManager{
     }
     
     //This function will deal requests having body data
-    func request(url: String, method: String, body: [String: Any]? = nil, completion: @escaping (Data?, Error?) -> Void) {
-        guard let url = URL(string: baseURL + url) else {
-            completion(nil, NSError(domain: "Invalid URL", code: 404))
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = method
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        // Adding body data here for POST method call
-        if let body = body {
-            do {
-                request.httpBody = try JSONSerialization.data(withJSONObject: body)
-            } catch {
-                completion(nil, error)
-                return
-            }
-        }
-        
-        //calling the API here
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async {
-                completion(data, error)
-            }
-        }
-        
-        task.resume()
-    }
+//    func request(url: String, method: String, body: [String: Any]? = nil, completion: @escaping (Data?, Error?) -> Void) {
+//        guard let url = URL(string: baseURL + url) else {
+//            completion(nil, NSError(domain: "Invalid URL", code: 404))
+//            return
+//        }
+//        
+//        var request = URLRequest(url: url)
+//        request.httpMethod = method
+//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+//        
+//        // Adding body data here for POST method call
+//        if let body = body {
+//            do {
+//                request.httpBody = try JSONSerialization.data(withJSONObject: body)
+//            } catch {
+//                completion(nil, error)
+//                return
+//            }
+//        }
+//        
+//        //calling the API here
+//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+//            DispatchQueue.main.async {
+//                completion(data, error)
+//            }
+//        }
+//        
+//        task.resume()
+//    }
 }

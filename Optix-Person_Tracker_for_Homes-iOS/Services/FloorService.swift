@@ -1,29 +1,26 @@
 //
-//  HomeService.swift
+//  FloorService.swift
 //  Optix-Person_Tracker_for_Homes-iOS
 //
-//  Created by Hussnain on 21/1/26.
+//  Created by Hussnain on 2/2/26.
 //
 
 import Foundation
-import SwiftUI
 
-class HomeService {
-    
+class FloorService {
+ 
     private let Network = NetworkManager()
     
-    // Func to get the DashboardStats
-    func getDashboardStats(username: String, jwtToken: String, userId: String, completion: @escaping (Result<DashboardResponse, Error>) -> Void) {
-        
-        // Making the URL for the Request
-        let urlString = "/dashboard/summary?username=\(username)&jwt_token=\(jwtToken)&user_id=\(userId)"
+    func fetchAllFloors(username: String, jwtToken: String, userId: String, completion: @escaping (Result<FloorResponse, Error>) -> Void){
+       
+        let urlString = "/floor/fetch_all?username=\(username)&jwt_token=\(jwtToken)&user_id=\(userId)"
         
         // Making the Get Request
         Network.request(url: urlString, method: "get") { data, response, error in
             
             // Handle Network/Transport Errors
             if let error = error {
-                print("Network error on /dashboard/summary: \(error)")
+                print("Network error on /fetch/fetch_all: \(error)")
                 completion(.failure(error))
                 return
             }
@@ -52,7 +49,7 @@ class HomeService {
             
             // Handle Success Data Decoding
             guard let data = data else {
-                let noDataError = NSError(domain: "Dashboard", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                let noDataError = NSError(domain: "Floor List", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
                 completion(.failure(noDataError))
                 return
             }
@@ -61,10 +58,10 @@ class HomeService {
                 let decoder = JSONDecoder()
                 
                 // Decodeing DashboardResponse
-                let dashboardData = try decoder.decode(DashboardResponse.self, from: data)
+                let floorListData = try decoder.decode(FloorResponse.self, from: data)
                 
                 // Success
-                completion(.success(dashboardData))
+                completion(.success(floorListData))
                 
             } catch {
                 print("Decoding failed: \(error)")
@@ -75,5 +72,7 @@ class HomeService {
                 completion(.failure(error))
             }
         }
+        
     }
+    
 }

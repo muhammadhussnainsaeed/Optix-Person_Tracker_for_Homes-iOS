@@ -12,7 +12,7 @@ struct NetworkImageView: View {
     
     // Replace this with your actual server IP/Domain
     // ⚠️ IMPORTANT: Don't forget the 'http://' and port if needed
-    let baseURL = "http://192.168.100.31:8888/"
+    let baseURL = "http://192.168.100.8:8888/"
     
     var fullURL: URL? {
         // If string is nil or empty, return nil
