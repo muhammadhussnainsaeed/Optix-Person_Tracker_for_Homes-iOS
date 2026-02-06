@@ -115,6 +115,7 @@ class CCTVViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var cctvReponse: CCTVResponse?
     @Published var cameraGraph: CameraGraphResponse?
+    @Published var cctvResponseForCamera: CCTVResponseForUpdateDelete?
     
     func fetchCCTVlist(context: ModelContext) async {
         
@@ -207,6 +208,7 @@ class CCTVViewModel: ObservableObject {
         }
     }
     
+    // Fething the data for Camera Graph
     func fetchCameraGraph() async {
         
         isLoading = true
@@ -274,6 +276,68 @@ class CCTVViewModel: ObservableObject {
             //                print("Graph Parsing Error: \(error)")
             //            }
             //        }
+        }
+    }
+    
+    // Updating the Camera
+    func updateCamera(cctvObjectForUpadte: CCTV) async{
+        
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                cctvServiceObject.updateCamera(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", cameraToUpdate: cctvObjectForUpadte) { result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+            
+            self.cctvResponseForCamera = fetchedData
+            
+            print("\(fetchedData)")
+            
+            self.isLoading = false
+            print("Camera has been updated")
+            
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+            
+        }
+    }
+    
+    // Deleting the Camera
+    func deleteCamera(cameraId: UUID) async{
+        
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                cctvServiceObject.deleteCamera(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", cameraId: cameraId) { result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+            
+            self.cctvResponseForCamera = fetchedData
+            
+            print("\(fetchedData)")
+            
+            self.isLoading = false
+            print("Camera has been deleted")
+            
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+            
         }
     }
 }

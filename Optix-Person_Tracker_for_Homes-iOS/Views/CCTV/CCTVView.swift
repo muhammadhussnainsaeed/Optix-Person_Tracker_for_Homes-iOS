@@ -12,6 +12,12 @@ struct CCTVView: View {
     @State private var isShowingSheetCameraList = false
     @State private var isShowingSheetMatrix = false
     @State private var isShowingSheetFloor = false
+    @State private var showDeleteAlert = false
+    @State private var cameraToDelete : CCTV?
+    @State private var cameraToUpdate : CCTV?
+    @State private var isPresentAlert : Bool = false
+    @State private var alertMessage : String = ""
+    @State private var error: Bool = false
     
     @State var cameraObjectForDetails : CCTV?
     @Environment(\.modelContext) private var context
@@ -76,6 +82,22 @@ struct CCTVView: View {
                             print("Tapped \(camera.videoURL)")
                             
                             cameraObjectForDetails = camera
+                        }
+                        .contextMenu {
+                            Button {
+                                print("Edit Tapped")
+                                cameraToUpdate = camera
+                            } label: {
+                                Text("Edit")
+                            }
+                            
+                            Button(role: .destructive) {
+                                print("Delete Tapped")
+                                showDeleteAlert.toggle()
+                                cameraToDelete = camera
+                            } label: {
+                                Text("Delete")
+                            }
                         }
                         .padding(.horizontal, 30)
                         .padding(.bottom, 7)
@@ -178,7 +200,8 @@ struct CCTVView: View {
                 Spacer()
                 HStack{
                     Spacer()
-                    Button {                        isShowingSheetMatrix = true
+                    Button {
+                        isShowingSheetMatrix = true
                     } label: {
                         Image(systemName: "tablecells")
                             .font(.title2)
@@ -193,10 +216,36 @@ struct CCTVView: View {
 
             }
         }
+        .alert("Delete Camera?", isPresented: $showDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                if let camera = cameraToDelete {
+                    Task{
+                        await cctvViewModelObject.deleteCamera(cameraId: camera.id)
+                        if (cctvViewModelObject.errorMessage != nil){
+                            alertMessage = cctvViewModelObject.errorMessage ?? ""
+                            error.toggle()
+                            isPresentAlert.toggle()
+                        }
+                        else{
+                            alertMessage = cctvViewModelObject.cctvResponseForCamera?.message ?? ""
+                            isPresentAlert.toggle()
+                         }
+                    }
+                    print("Deleted \(camera.name)")
+                }
+            }
+        }message: {
+                    Text("Are you sure you want to delete this camera? Log related to this camera will also be deleted and this action cannot be undone.")
+        }
         .sheet(isPresented: $isShowingSheetMatrix, content: {
             RelationshipMatrixView()
                 .presentationDragIndicator(.visible)
         })
+        .sheet(item: $cameraToUpdate) { camera in
+            UpdateCCTVView(isUpdate: true,cameraId: camera.id, floorId: camera.floorId, name: camera.name, location: camera.location, description: camera.cctvDescription, videoFeedURL: camera.videoURL, isPrivate: camera.isPrivate)
+                .presentationDragIndicator(.visible)
+        }
         .sheet(isPresented: $isShowingSheetCameraList, content: {
             CameraListView()
                 .presentationDragIndicator(.visible)
@@ -218,6 +267,13 @@ struct CCTVView: View {
             Task {
                 await cctvViewModelObject.fetchCCTVlist(context: context)
             }
+        }
+        .alert(error ? "Error" : "Success", isPresented: $isPresentAlert) {
+            Button("OK", role: .cancel) {
+                print("Okay")
+            }
+        } message: {
+            Text(alertMessage)
         }
     }
 }

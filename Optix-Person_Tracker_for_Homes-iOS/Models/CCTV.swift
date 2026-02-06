@@ -39,4 +39,12 @@ struct CCTV: Codable,Identifiable {
     }
 }
 
-
+struct CCTVResponseForUpdateDelete: Codable {
+    let message: String
+    let id: UUID
+    let name: String
+    
+    enum CodingKeys: String, CodingKey {
+        case message, id , name
+    }
+}
