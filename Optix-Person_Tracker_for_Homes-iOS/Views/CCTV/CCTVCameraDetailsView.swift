@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CCTVCameraDetailsView: View {
-    @Environment(\.dismiss) var dismiss
+    //@Environment(\.dismiss) var dismiss
     let camera: CCTV
     var body: some View {
         NavigationStack {
@@ -37,7 +37,6 @@ struct CCTVCameraDetailsView: View {
                                     Text("CCTV Camera is Private")
                                         .font(.callout)
                                 }
-                                
                             }
                     }
                     VStack{
@@ -69,12 +68,14 @@ struct CCTVCameraDetailsView: View {
                     .padding(.top, 50)
                     .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 0)
                 }
-                .padding(.top, 50)
+                .padding(.top, 15)
                 .padding(.horizontal,30)
+                .padding(.bottom)
             }
+            .scrollIndicators(.hidden)
+            .navigationTitle("\(camera.name)")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationTitle("\(camera.name)")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

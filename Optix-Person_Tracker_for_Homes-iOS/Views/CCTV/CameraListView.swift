@@ -132,7 +132,7 @@ struct CameraListView: View {
         .sheet(item: $cameraObjectForDetails) { camera in
                     CCTVCameraDetailsView(camera: camera)
                 .presentationDragIndicator(.visible)
-                .presentationBackgroundInteraction(.enabled)
+                .presentationDetents([.medium])
                 }
         .onAppear(){
             Task{

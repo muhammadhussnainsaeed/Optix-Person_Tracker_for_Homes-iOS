@@ -48,3 +48,22 @@ struct CCTVResponseForUpdateDelete: Codable {
         case message, id , name
     }
 }
+
+
+// For Camera Network
+struct CCTVNetworkResponse: Codable {
+    let message: String
+    let cameraList: [CCTVNetworkItem]?
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+        case cameraList = "camera_list"
+    }
+}
+struct CCTVNetworkItem: Codable, Identifiable {
+    let id : UUID
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "connected_camera_id"
+    }
+}

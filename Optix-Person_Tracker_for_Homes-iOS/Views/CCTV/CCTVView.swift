@@ -10,11 +10,13 @@ import SwiftUI
 struct CCTVView: View {
     
     @State private var isShowingSheetCameraList = false
+    @State private var isShowingSheetCameraNetworkList = false
     @State private var isShowingSheetMatrix = false
     @State private var isShowingSheetFloor = false
     @State private var showDeleteAlert = false
     @State private var cameraToDelete : CCTV?
     @State private var cameraToUpdate : CCTV?
+    @State private var cameraForNetwork : CCTV?
     @State private var isPresentAlert : Bool = false
     @State private var alertMessage : String = ""
     @State private var error: Bool = false
@@ -110,6 +112,7 @@ struct CCTVView: View {
                     Spacer()
                     Button {
                         print("View All")
+                        isShowingSheetCameraNetworkList.toggle()
                     } label: {
                         HStack{
                             Text("View all")
@@ -146,6 +149,7 @@ struct CCTVView: View {
                     // USE FOREACH (Safely loops through bottomCameras)
                     ForEach(topCameras) { camera in
                         InfoCard(cardType: .cctv, id: camera.id, name: camera.name, roomName: "", floorName: "", description: camera.cctvDescription, detected_date: "", detected_time: "", photo: "") {
+                            cameraForNetwork = camera
                             print("Tapped \(camera.name)")
                         }
                         .padding(.horizontal, 30)
@@ -242,6 +246,10 @@ struct CCTVView: View {
             RelationshipMatrixView()
                 .presentationDragIndicator(.visible)
         })
+        .sheet(item: $cameraForNetwork, content: { camera in
+            CameraNetworkView(camera: camera)
+                .presentationDragIndicator(.visible)
+        })
         .sheet(item: $cameraToUpdate) { camera in
             UpdateCCTVView(isUpdate: true,cameraId: camera.id, floorId: camera.floorId, name: camera.name, location: camera.location, description: camera.cctvDescription, videoFeedURL: camera.videoURL, isPrivate: camera.isPrivate)
                 .presentationDragIndicator(.visible)
@@ -250,9 +258,14 @@ struct CCTVView: View {
             CameraListView()
                 .presentationDragIndicator(.visible)
         })
+        .sheet(isPresented: $isShowingSheetCameraNetworkList, content: {
+            CameraNetworkListView()
+                .presentationDragIndicator(.visible)
+        })
         .sheet(item: $cameraObjectForDetails) { camera in
                     CCTVCameraDetailsView(camera: camera)
                         .presentationDragIndicator(.visible)
+                        .presentationDetents([.medium])
                 }
         .navigationDestination(isPresented: $isShowingSheetFloor, destination: {
             FloorListView()
