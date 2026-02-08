@@ -15,6 +15,7 @@ class CCTVViewModel: ObservableObject {
     @Published var cameraGraph: CameraGraphResponse?
     @Published var cctvResponseForCamera: CCTVResponseForUpdateDelete?
     @Published var cctvNetworkResponse: CCTVNetworkResponse?
+    @Published var cctvNetworkUpdateResponse: CCTVResponseForNetworkUpdate?
     
     // Getting Cameras
     func fetchCCTVlist(context: ModelContext) async {
@@ -235,4 +236,35 @@ class CCTVViewModel: ObservableObject {
             self.isLoading = false
         }
     }
+    
+    // Updating the Camera Network
+    func updateCameraNetwork(cameraId: UUID, newNetwork: [CCTVNetworkItem]) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                
+                cctvServiceObject.updateCameraNetwork(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", cameraId: cameraId.uuidString, cameraList: newNetwork){ result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+            
+            self.cctvNetworkUpdateResponse = fetchedData
+            
+            print("\(fetchedData)")
+            
+            self.isLoading = false
+            print("Camera Network has been updated")
+            
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+            
+        }
+    }
 }
+

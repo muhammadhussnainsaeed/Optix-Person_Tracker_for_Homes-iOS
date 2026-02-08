@@ -9,7 +9,9 @@ import SwiftUI
 
 struct CameraNetworkView: View {
     
+    @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var context
+    
     @State var directConnectedList: [CCTVNetworkItem] = []
     @State var otherList: [CCTVNetworkItem] = []
     
@@ -114,6 +116,18 @@ struct CameraNetworkView: View {
                 
                 // MARK: - 4. Save Button
                 PrimaryButton(buttonText: "Save", buttonTextColor: .black, buttonColor: "custom_yellow", action: {
+                    Task{
+                        await cctvViewModelObject.updateCameraNetwork(cameraId: camera.id, newNetwork: directConnectedList)
+                        if (cctvViewModelObject.errorMessage != nil){
+                            alertMessage = cctvViewModelObject.errorMessage ?? ""
+                            error.toggle()
+                            isPresentAlert.toggle()
+                        }
+                        else{
+                            alertMessage = cctvViewModelObject.cctvNetworkUpdateResponse?.message ?? ""
+                            isPresentAlert.toggle()
+                         }
+                    }
                     // Action code...
                 }, isLoading: cctvViewModelObject.isLoading)
                 .padding(.bottom, 12)
@@ -127,7 +141,11 @@ struct CameraNetworkView: View {
                 }
             }
             .alert(error ? "Error" : "Success", isPresented: $isPresentAlert) {
-                Button("OK", role: .cancel) { }
+                Button("OK", role: .cancel) {
+                    if !error {
+                        dismiss()
+                    }
+                }
             } message: {
                 Text(alertMessage)
             }

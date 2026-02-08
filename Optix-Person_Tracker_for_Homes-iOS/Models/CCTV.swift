@@ -67,3 +67,12 @@ struct CCTVNetworkItem: Codable, Identifiable {
         case id = "connected_camera_id"
     }
 }
+
+// Used to get the response of the network/update API
+struct CCTVResponseForNetworkUpdate: Codable {
+    let message: String
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+    }
+}
