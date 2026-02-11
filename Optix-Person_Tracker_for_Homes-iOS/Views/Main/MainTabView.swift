@@ -35,7 +35,7 @@ struct MainTabView: View {
             
             // TAB 3: FAMILY
             NavigationStack {
-                Text("Family")
+                FamilyView()
             }
             .tag(AppTab.family)
             .tabItem {

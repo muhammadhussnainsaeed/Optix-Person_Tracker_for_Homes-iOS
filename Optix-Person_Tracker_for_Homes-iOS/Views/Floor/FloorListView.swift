@@ -64,7 +64,7 @@ struct FloorListView: View {
                                 description: floor.description,
                                 detected_date: "",
                                 detected_time: "",
-                                photo: ""
+                                photo: "", relationship: ""
                             ) {
                                 print("Tapped \(floor.title)")
                                 floorObjectForDetails = floor

@@ -80,7 +80,7 @@ struct CCTVView: View {
                     
                     // USE FOREACH (Safely loops through topCameras)
                     ForEach(topCameras) { camera in
-                        InfoCard(cardType: .cctv, id: camera.id, name: camera.name, roomName: "", floorName: "", description: camera.cctvDescription, detected_date: "", detected_time: "", photo: "") {
+                        InfoCard(cardType: .cctv, id: camera.id, name: camera.name, roomName: "", floorName: "", description: camera.cctvDescription, detected_date: "", detected_time: "", photo: "", relationship: "") {
                             print("Tapped \(camera.videoURL)")
                             
                             cameraObjectForDetails = camera
@@ -148,7 +148,7 @@ struct CCTVView: View {
                     
                     // USE FOREACH (Safely loops through bottomCameras)
                     ForEach(topCameras) { camera in
-                        InfoCard(cardType: .cctv, id: camera.id, name: camera.name, roomName: "", floorName: "", description: camera.cctvDescription, detected_date: "", detected_time: "", photo: "") {
+                        InfoCard(cardType: .cctv, id: camera.id, name: camera.name, roomName: "", floorName: "", description: camera.cctvDescription, detected_date: "", detected_time: "", photo: "", relationship: "") {
                             cameraForNetwork = camera
                             print("Tapped \(camera.name)")
                         }

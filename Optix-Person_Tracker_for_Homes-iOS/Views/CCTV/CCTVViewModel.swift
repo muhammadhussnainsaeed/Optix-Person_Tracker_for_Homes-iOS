@@ -9,13 +9,14 @@ class CCTVViewModel: ObservableObject {
     @Published var cctvServiceObject = CCTVService()
     @Published var cctvlist: [CCTV] = []
     @Published var cctvNetworkList: [CCTVNetworkItem] = []
-    @Published var isLoading: Bool = false
-    @Published var errorMessage: String?
     @Published var cctvReponse: CCTVResponse?
     @Published var cameraGraph: CameraGraphResponse?
     @Published var cctvResponseForCamera: CCTVResponseForUpdateDelete?
     @Published var cctvNetworkResponse: CCTVNetworkResponse?
     @Published var cctvNetworkUpdateResponse: CCTVResponseForNetworkUpdate?
+    
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
     
     // Getting Cameras
     func fetchCCTVlist(context: ModelContext) async {

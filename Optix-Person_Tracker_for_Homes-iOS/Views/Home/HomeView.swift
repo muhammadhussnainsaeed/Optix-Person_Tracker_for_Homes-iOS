@@ -73,7 +73,7 @@ struct HomeView: View {
                             // FIX: Use AppFormatter correctly (static calls)
                             detected_date: AppFormatter.shared.getFormattedDate(from: familyLog.detectedAt),
                             detected_time: AppFormatter.shared.getFormattedTime(from: familyLog.detectedAt),
-                            photo: familyLog.photo
+                            photo: familyLog.photo, relationship: ""
                         ) {
                             print("")
                         }
@@ -92,7 +92,7 @@ struct HomeView: View {
                             description: "",
                             detected_date: AppFormatter.shared.getFormattedDate(from: unwantedLog.detectedAt),
                             detected_time: AppFormatter.shared.getFormattedTime(from: unwantedLog.detectedAt),
-                            photo: unwantedLog.photo
+                            photo: unwantedLog.photo, relationship: ""
                         ) {
                             print("")
                         }

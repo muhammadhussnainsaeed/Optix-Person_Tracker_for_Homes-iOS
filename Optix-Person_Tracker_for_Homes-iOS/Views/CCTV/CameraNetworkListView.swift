@@ -42,7 +42,7 @@ struct CameraNetworkListView: View {
                                     description: camera.cctvDescription,
                                     detected_date: "",
                                     detected_time: "",
-                                    photo: ""
+                                    photo: "", relationship: ""
                                 ) {
                                     print("Tapped \(camera.name)")
                                     cameraForNetwork = camera

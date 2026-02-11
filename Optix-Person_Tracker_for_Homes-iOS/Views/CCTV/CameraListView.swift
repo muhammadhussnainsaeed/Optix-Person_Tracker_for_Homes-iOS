@@ -10,7 +10,7 @@ import SwiftUI
 struct CameraListView: View {
     
     // 1. Add Dismiss Environment to close the sheet
-    @Environment(\.dismiss) var dismiss
+    //@Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var context
     @State private var showDeleteAlert = false
     @State private var cameraToDelete : CCTV?
@@ -52,7 +52,7 @@ struct CameraListView: View {
                                     description: camera.cctvDescription,
                                     detected_date: "",
                                     detected_time: "",
-                                    photo: ""
+                                    photo: "", relationship: ""
                                 ) {
                                     print("Tapped \(camera.name)")
                                     cameraObjectForDetails = camera

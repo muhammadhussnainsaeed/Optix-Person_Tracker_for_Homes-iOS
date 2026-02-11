@@ -12,6 +12,16 @@ struct FamilyView: View {
     @State var isShowingSheetFamilyList: Bool = false
     @State var isShowingSheetFamilyLogsList: Bool = false
     
+    @State var memberObjectForDetails: Family?
+    
+    @Environment(\.modelContext) private var context
+    @StateObject var familyViewModelObject = FamilyViewModel()
+    
+    var topFamilyMembers: [Family] {
+        // This grabs the first 3. If there are only 2, it grabs 2. No crash.
+        Array(familyViewModelObject.familyMemberList.prefix(3))
+    }
+    
     var body: some View {
         ZStack(alignment: .top){
             
@@ -39,7 +49,7 @@ struct FamilyView: View {
                 .padding(.top, 30)
                 .padding(.bottom, 20)
                 
-                if true {
+                if topFamilyMembers.isEmpty {
                     VStack{
                         HStack(spacing: 10) {
                             Image(systemName: "person.2.slash")
@@ -58,35 +68,35 @@ struct FamilyView: View {
                     }
                     .padding(.bottom, 50)
                 }
-//                else{
-//                    
-//                    // USE FOREACH (Safely loops through topCameras)
-//                    ForEach(topCameras) { camera in
-//                        InfoCard(cardType: .cctv, id: camera.id, name: camera.name, roomName: "", floorName: "", description: camera.cctvDescription, detected_date: "", detected_time: "", photo: "") {
-//                            print("Tapped \(camera.videoURL)")
-//                            
-//                            cameraObjectForDetails = camera
-//                        }
-//                        .contextMenu {
-//                            Button {
+                else{
+                    
+                    // USE FOREACH (Safely loops through topCameras)
+                    ForEach(topFamilyMembers) { member in
+                        InfoCard(cardType: .family, id: member.id, name: member.name, roomName: "", floorName: "", description: "", detected_date: "", detected_time: "", photo: "\(member.photos[0].photo)", relationship: member.relationship) {
+                            print("Tapped \(member.name)")
+                            
+                            memberObjectForDetails = member
+                        }
+                        .contextMenu {
+                            Button {
 //                                print("Edit Tapped")
 //                                cameraToUpdate = camera
-//                            } label: {
-//                                Text("Edit")
-//                            }
-//                            
-//                            Button(role: .destructive) {
-//                                print("Delete Tapped")
+                            } label: {
+                                Text("Edit")
+                            }
+                            
+                            Button(role: .destructive) {
+                                print("Delete Tapped")
 //                                showDeleteAlert.toggle()
 //                                cameraToDelete = camera
-//                            } label: {
-//                                Text("Delete")
-//                            }
-//                        }
-//                        .padding(.horizontal, 30)
-//                        .padding(.bottom, 7)
-//                    }
-//                }
+                            } label: {
+                                Text("Delete")
+                            }
+                        }
+                        .padding(.horizontal, 30)
+                        .padding(.bottom, 7)
+                    }
+                }
                 
                 // MARK: - LIST 2: The First 3 Cameras
                 HStack{
@@ -161,19 +171,20 @@ struct FamilyView: View {
                 .padding(.horizontal, 30)
                 .background(.ultraThinMaterial)
                 .ignoresSafeArea(edges: .top)
-//                if cctvViewModelObject.isLoading {
-//                    HStack{
-//                        ProgressView()
-//                            .tint(.customBlue)
-//                        Text("Connecting...")
-//                            .font(.caption)
-//                            .foregroundColor(.primary)
-//                    }
-//                    .padding(2)
-//                    .frame(width: 130, height: 30)
-//                    .glassEffect()
-//                    Spacer()
-//                }
+                if familyViewModelObject
+                    .isLoading {
+                    HStack{
+                        ProgressView()
+                            .tint(.customBlue)
+                        Text("Connecting...")
+                            .font(.caption)
+                            .foregroundColor(.primary)
+                    }
+                    .padding(2)
+                    .frame(width: 130, height: 30)
+                    .glassEffect()
+                    Spacer()
+                }
                 Spacer()
                 HStack{
                     Spacer()
@@ -191,6 +202,26 @@ struct FamilyView: View {
                     .tint(Color("custom_blue"))
                 }
 
+            }
+        }
+        .sheet(item: $memberObjectForDetails) { member in
+                    FamilyMemberDetailView(member: member)
+                        .presentationDragIndicator(.visible)
+                        .presentationDetents([.height(320)])
+                }
+        .sheet(isPresented: $isShowingSheetFamilyList, content: {
+            FamilyListView() 
+                .presentationDragIndicator(.visible)
+        })
+
+        .onAppear(){
+            Task{
+                await familyViewModelObject.fetchFamilyMemberList(context: context)
+            }
+        }
+        .refreshable {
+            Task{
+                await familyViewModelObject.fetchFamilyMemberList(context: context)
             }
         }
     }

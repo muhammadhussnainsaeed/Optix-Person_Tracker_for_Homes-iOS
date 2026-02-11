@@ -67,5 +67,5 @@ struct NetworkImageView: View {
 }
 
 #Preview {
-    NetworkImageView(urlString: "/media")
+    NetworkImageView(urlString: "media/persons/4f9e6836-cd16-4ae3-9206-fea37dff3520_1.jpg")
 }

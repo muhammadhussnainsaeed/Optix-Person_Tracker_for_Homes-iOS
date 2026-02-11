@@ -9,6 +9,7 @@ import SwiftUI
 
 enum InfoCardStyle {
     case family
+    case familylog
     case cctv
     case alert
     case floorPlan
@@ -16,6 +17,7 @@ enum InfoCardStyle {
     // Background Color
     var backgroundColor: Color {
         switch self {
+        case .familylog: return Color("custom_light_ blue")
         case .family: return Color("custom_light_blue")
         case .cctv:   return Color("custom_color")
         case .alert:  return Color("custom_blue")
@@ -26,6 +28,7 @@ enum InfoCardStyle {
     // Text Color
     var textColor: Color {
         switch self {
+        case .familylog: return .primary
         case .family: return .primary
         case .cctv:   return .primary
         case .alert:  return .white
@@ -44,11 +47,55 @@ struct InfoCard: View {
     let detected_date: String
     let detected_time: String
     let photo: String
-    //let snapshot_url: String
+    let relationship: String
     let action: () -> Void
     var body: some View {
         
-        if cardType == .alert || cardType == .family {
+        if cardType == .family{
+            Button {
+                print("\(photo)")
+                action()
+            } label: {
+                HStack{
+                    VStack{
+                        NetworkImageView(urlString: photo)
+                            .frame(width: 60, height: 60)
+                            .cornerRadius(13)
+                    }
+                    VStack{
+                        HStack{
+                            Text("\(Text("Name: ").fontWeight(.bold))\(name)")
+                                .font(.caption)
+                                .foregroundColor(cardType.textColor)
+                            Spacer()
+                        }
+                        //Spacer()
+                        HStack{
+                            Text("\(Text("Relationship:").fontWeight(.bold)) \(relationship)")
+                                .font(.caption)
+                                .foregroundColor(cardType.textColor)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer()
+                        }
+                    }
+                    .padding(.horizontal, 10)
+                    VStack{
+                        RoundButton(buttonColor: "custom_yellow", buttonArrowColor: .black)
+                        Spacer()
+                    }
+                }
+                .padding(12)
+                .frame(height: 85)
+                .frame(maxWidth: .infinity)
+                .background(Color(cardType.backgroundColor))
+                .cornerRadius(15)
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 0)
+            }
+        }
+        
+        if cardType == .alert || cardType == .familylog {
             
             Button {
                 action()
@@ -193,7 +240,7 @@ struct InfoCard: View {
 }
 
 #Preview {
-    InfoCard(cardType: .floorPlan, id: UUID(), name: "Room 1", roomName: "Room 1", floorName: "First Floor",description: "This is a room 1 and this is a back door sdfuje fwefwe wefnwe webfwbef weufbwe weufwe wefbwe weufbwe weufwe ", detected_date: "Octcuber 12, 2025", detected_time: "12:00 AM",photo: "", action: {
+    InfoCard(cardType: .family, id: UUID(), name: "Room 1", roomName: "Room 1", floorName: "First Floor",description: "This is a room 1 and this is a back door sdfuje fwefwe wefnwe webfwbef weufbwe weufwe wefbwe weufbwe weufwe ", detected_date: "Octcuber 12, 2025", detected_time: "12:00 AM",photo: "",relationship: "Sister", action: {
         print("")
     })
 }
