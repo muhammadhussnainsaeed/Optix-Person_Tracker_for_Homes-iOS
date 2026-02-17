@@ -11,8 +11,16 @@ struct FamilyView: View {
     
     @State var isShowingSheetFamilyList: Bool = false
     @State var isShowingSheetFamilyLogsList: Bool = false
+    @State var isShowingSheetAddMember: Bool = false
+    
+    @State private var showDeleteAlert = false
+    @State private var isPresentAlert : Bool = false
+    @State private var alertMessage : String = ""
+    @State private var error: Bool = false
     
     @State var memberObjectForDetails: Family?
+    @State var memberObjectForUpdate: Family?
+    @State var memberObjectForDelete: Family?
     
     @Environment(\.modelContext) private var context
     @StateObject var familyViewModelObject = FamilyViewModel()
@@ -79,16 +87,16 @@ struct FamilyView: View {
                         }
                         .contextMenu {
                             Button {
-//                                print("Edit Tapped")
-//                                cameraToUpdate = camera
+                                print("Edit Tapped")
+                                memberObjectForUpdate = member
                             } label: {
                                 Text("Edit")
                             }
                             
                             Button(role: .destructive) {
                                 print("Delete Tapped")
-//                                showDeleteAlert.toggle()
-//                                cameraToDelete = camera
+                                showDeleteAlert.toggle()
+                                memberObjectForDelete = member
                             } label: {
                                 Text("Delete")
                             }
@@ -189,7 +197,7 @@ struct FamilyView: View {
                 HStack{
                     Spacer()
                     Button {
-                        //isShowingSheetMatrix = true
+                        isShowingSheetAddMember = true
                     } label: {
                         Image(systemName: "plus")
                             .font(.title2)
@@ -204,16 +212,54 @@ struct FamilyView: View {
 
             }
         }
+        .alert("Delete Family Member?", isPresented: $showDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                if let member = memberObjectForDelete {
+                    Task{
+                        await familyViewModelObject.deleteFamilyMember(memberId: member.id)
+                        if (familyViewModelObject.errorMessage != nil){
+                            alertMessage = familyViewModelObject.errorMessage ?? ""
+                            error.toggle()
+                            isPresentAlert.toggle()
+                        }
+                        else{
+                            alertMessage = familyViewModelObject.addUpdateDeleteMemberResponse?.message ?? ""
+                            isPresentAlert.toggle()
+                         }
+                    }
+                    print("Deleted \(member.name)")
+                }
+            }
+        }message: {
+                    Text("Are you sure you want to delete this camera? Log related to this camera will also be deleted and this action cannot be undone.")
+        }
+        .alert(error ? "Error" : "Success", isPresented: $isPresentAlert) {
+            Button("OK", role: .cancel) {
+                if error{
+                    error.toggle()
+                }
+            }
+        } message: {
+            Text(alertMessage)
+        }
         .sheet(item: $memberObjectForDetails) { member in
                     FamilyMemberDetailView(member: member)
                         .presentationDragIndicator(.visible)
                         .presentationDetents([.height(320)])
                 }
+        .sheet(item: $memberObjectForUpdate) { member in
+                    AddUpdateFamilyMemberView(isUpdate: true, member: member)
+                        .presentationDragIndicator(.visible)
+                }
         .sheet(isPresented: $isShowingSheetFamilyList, content: {
             FamilyListView() 
                 .presentationDragIndicator(.visible)
         })
-
+        .sheet(isPresented: $isShowingSheetAddMember, content: {
+            AddUpdateFamilyMemberView(isUpdate: false, member: nil)
+                .presentationDragIndicator(.visible)
+        })
         .onAppear(){
             Task{
                 await familyViewModelObject.fetchFamilyMemberList(context: context)

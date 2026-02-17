@@ -15,13 +15,13 @@ struct FamilyMemberDetailView: View {
         NavigationStack{
             VStack{
                 HStack(spacing: 40){
-                    NetworkImageView(urlString: member.photos[0].photo)
+                    ImageView(urlString: member.photos[0].photo, localImage: nil)
                         .frame(width: 80, height: 80)
                         .cornerRadius(13)
-                    NetworkImageView(urlString: member.photos[1].photo)
+                    ImageView(urlString: member.photos[1].photo, localImage: nil)
                         .frame(width: 80, height: 80)
                         .cornerRadius(13)
-                    NetworkImageView(urlString: member.photos[2].photo)
+                    ImageView(urlString: member.photos[2].photo, localImage: nil)
                         .frame(width: 80, height: 80)
                         .cornerRadius(13)
                 }

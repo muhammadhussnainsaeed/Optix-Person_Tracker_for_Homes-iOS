@@ -58,7 +58,7 @@ struct InfoCard: View {
             } label: {
                 HStack{
                     VStack{
-                        NetworkImageView(urlString: photo)
+                        ImageView(urlString: photo, localImage: nil)
                             .frame(width: 60, height: 60)
                             .cornerRadius(13)
                     }
@@ -102,7 +102,7 @@ struct InfoCard: View {
             } label: {
                 HStack{
                     VStack{
-                        NetworkImageView(urlString: photo)
+                        ImageView(urlString: photo, localImage: nil)
                             .frame(width: 60, height: 60)
                             .cornerRadius(13)
                     }

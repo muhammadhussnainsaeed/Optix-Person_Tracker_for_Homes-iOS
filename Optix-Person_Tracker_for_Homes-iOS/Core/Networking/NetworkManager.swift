@@ -10,7 +10,7 @@ import Foundation
 class NetworkManager{
     let baseURL = "http://192.168.100.8:8888"
     
-    //This function will deal requests having nil body data
+    //This function will deal requests having nil body and body data
     func request(url: String, method: String, body: [String: Any]? = nil, completion: @escaping (Data?, URLResponse?, Error?) -> Void) {
         
         // 1. Construct the URL
@@ -42,35 +42,73 @@ class NetworkManager{
         
         task.resume()
     }
-    
-    //This function will deal requests having body data
-//    func request(url: String, method: String, body: [String: Any]? = nil, completion: @escaping (Data?, Error?) -> Void) {
-//        guard let url = URL(string: baseURL + url) else {
-//            completion(nil, NSError(domain: "Invalid URL", code: 404))
-//            return
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = method
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//        
-//        // Adding body data here for POST method call
-//        if let body = body {
-//            do {
-//                request.httpBody = try JSONSerialization.data(withJSONObject: body)
-//            } catch {
-//                completion(nil, error)
-//                return
-//            }
-//        }
-//        
-//        //calling the API here
-//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//            DispatchQueue.main.async {
-//                completion(data, error)
-//            }
-//        }
-//        
-//        task.resume()
-//    }
+
+    // This function will deal request having multipart
+    func multipartRequest(url: String, method: String, params: [String: String]? = nil, files: [MediaFile]? = nil, completion: @escaping (Data?, URLResponse?, Error?) -> Void) {
+        
+        guard let urlObj = URL(string: baseURL + url) else {
+            completion(nil, nil, NSError(domain: "Invalid URL", code: 404))
+            return
+        }
+        
+        var request = URLRequest(url: urlObj)
+        request.httpMethod = method
+        
+        let boundary = "Boundary-\(UUID().uuidString)"
+        
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        // Construct the Body
+        // This helper function combines text params and files
+        request.httpBody = createMultipartBody(params: params, files: files, boundary: boundary)
+        
+        // 5. Call the API
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                completion(data, response, error)
+            }
+        }
+        
+        task.resume()
+    }
+
+    // Body Builder Helper for multipartRequest function
+    private func createMultipartBody(params: [String: String]?, files: [MediaFile]?, boundary: String) -> Data {
+        
+        let lineBreak = "\r\n"
+        var body = Data()
+        
+        // Add Text Parameters
+        if let parameters = params {
+            for (key, value) in parameters {
+                body.append("--\(boundary + lineBreak)")
+                body.append("Content-Disposition: form-data; name=\"\(key)\"\(lineBreak + lineBreak)")
+                body.append("\(value + lineBreak)")
+            }
+        }
+        
+        // Add File Parameters
+        if let mediaFiles = files {
+            for file in mediaFiles {
+                body.append("--\(boundary + lineBreak)")
+                body.append("Content-Disposition: form-data; name=\"\(file.key)\"; filename=\"\(file.filename)\"\(lineBreak)")
+                body.append("Content-Type: \(file.mimeType + lineBreak + lineBreak)")
+                body.append(file.data)
+                body.append(lineBreak)
+            }
+        }
+        
+        // Close the Boundary
+        body.append("--\(boundary)--\(lineBreak)")
+        
+        return body
+    }
+}
+
+extension Data {
+    mutating func append(_ string: String) {
+        if let data = string.data(using: .utf8) {
+            append(data)
+        }
+    }
 }

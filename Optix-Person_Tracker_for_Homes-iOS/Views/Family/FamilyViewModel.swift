@@ -16,13 +16,14 @@ class FamilyViewModel: ObservableObject {
     @Published var familyServiceObject = FamilyService()
     @Published var familyMemberList : [Family] = []
     @Published var familyMemberResponse : FamilyMemberResponse?
+    @Published var addUpdateDeleteMemberResponse: addUpdateDeleteFamilyMemberResponse?
     
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
     // Getting Family Members
     func fetchFamilyMemberList(context: ModelContext) async {
-            
+        
         self.loadFromCache(context: context)
         isLoading = true
         errorMessage = nil
@@ -49,7 +50,7 @@ class FamilyViewModel: ObservableObject {
             }
             
             self.isLoading = false
-           self.cacheData(context: context, response: fetchedData)
+            self.cacheData(context: context, response: fetchedData)
             print("Family Member updated from API")
             
         } catch {
@@ -93,16 +94,16 @@ class FamilyViewModel: ObservableObject {
             for object in members {
                 
                 let convertedPhotos = object.photos.map { apiPhoto in
-                                FamilyMemberPhoto(photo: apiPhoto.photo)
-                            }
-                            
-                            // 3. Initialize the cache object with the converted array
-                            let newMember = FamilyMemberCache(
-                                id: object.id,
-                                name: object.name,
-                                relationship: object.relationship,
-                                photos: convertedPhotos
-                            )
+                    FamilyMemberPhoto(photo: apiPhoto.photo)
+                }
+                
+                // 3. Initialize the cache object with the converted array
+                let newMember = FamilyMemberCache(
+                    id: object.id,
+                    name: object.name,
+                    relationship: object.relationship,
+                    photos: convertedPhotos
+                )
                 context.insert(newMember)
             }
             
@@ -112,4 +113,126 @@ class FamilyViewModel: ObservableObject {
             print("Caching failed: \(error)")
         }
     }
+    
+    // Creating New family Member
+    func addFamilyMember(name: String, relationship: String, photos: [Data]) async {
+
+        isLoading = true
+        errorMessage = nil
+
+        var filesToSend: [MediaFile] = []
+            let rawDataList = photos // Returns [Data]
+
+            for imageData in rawDataList {
+                // "files" matches your Python List[UploadFile]
+                let file = MediaFile(data: imageData, forKey: "files")
+                filesToSend.append(file)
+            }
+
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                familyServiceObject.createFamilyMember(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", relationship: relationship, name: name, files: filesToSend){ result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+
+            self.addUpdateDeleteMemberResponse = fetchedData
+
+//            // 1. UPDATE LIST: Use the fresh API data immediately
+//            if let familymember = fetchedData.familyMemberList {
+//                self.familyMemberList = familymember
+//            }
+
+            self.isLoading = false
+           //self.cacheData(context: context, response: fetchedData)
+            //print("D")
+
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+
+            // Fallback is already handled by the initial loadFromCache
+        }
+    }
+
+    // Updating Family Member details
+    func updateFamilyMember(memberId: UUID ,name: String, relationship: String, photos: [Data]) async {
+
+        isLoading = true
+        errorMessage = nil
+
+        var filesToSend: [MediaFile] = []
+            let rawDataList = photos // Returns [Data]
+
+            for imageData in rawDataList {
+                // "files" matches your Python List[UploadFile]
+                let file = MediaFile(data: imageData, forKey: "files")
+                filesToSend.append(file)
+            }
+
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                familyServiceObject.updateFamilyMember(memberId: memberId.uuidString,username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", relationship: relationship, name: name, files: filesToSend){ result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+
+            self.addUpdateDeleteMemberResponse = fetchedData
+
+//            // 1. UPDATE LIST: Use the fresh API data immediately
+//            if let familymember = fetchedData.familyMemberList {
+//                self.familyMemberList = familymember
+//            }
+
+            self.isLoading = false
+           //self.cacheData(context: context, response: fetchedData)
+            //print("D")
+
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+
+            // Fallback is already handled by the initial loadFromCache
+        }
+    }
+    
+    // Deleting Family Member
+    func deleteFamilyMember(memberId: UUID) async{
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                familyServiceObject.deleteFamilyMember(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", memberId: memberId.uuidString) { result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+            
+            self.addUpdateDeleteMemberResponse = fetchedData
+            
+            print("\(fetchedData)")
+            
+            self.isLoading = false
+            print("Family Member has been deleted")
+            
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+            
+        }
+    }
+    
 }
+

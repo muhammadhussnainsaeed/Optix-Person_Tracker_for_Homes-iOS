@@ -26,10 +26,6 @@ struct UpdateCCTVView: View {
     
     @StateObject var cctvViewModelObject = CCTVViewModel()
     
-    var buttonText: String {
-        isUpdate ? "Update" : "Save"
-    }
-    
     var body: some View {
         NavigationStack{
             ScrollView {
