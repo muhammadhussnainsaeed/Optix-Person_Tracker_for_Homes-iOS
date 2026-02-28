@@ -15,7 +15,8 @@ class AppFormatter {
         private let inputFormatter: DateFormatter = {
             let formatter = DateFormatter()
             // The pattern must match your input string EXACTLY:
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSSSSZ"
+            //formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSSSSZ"
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZZZZ"
             formatter.locale = Locale(identifier: "en_US_POSIX") // Critical for parsing server dates fixedly
             formatter.timeZone = TimeZone(secondsFromGMT: 0) // Optional: Adjust if needed
             return formatter

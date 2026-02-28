@@ -10,8 +10,6 @@ import SwiftUI
 
 class HomeService {
     
-    private let Network = NetworkManager()
-    
     // Func to get the DashboardStats
     func getDashboardStats(username: String, jwtToken: String, userId: String, completion: @escaping (Result<DashboardResponse, Error>) -> Void) {
         
@@ -19,7 +17,7 @@ class HomeService {
         let urlString = "/dashboard/summary?username=\(username)&jwt_token=\(jwtToken)&user_id=\(userId)"
         
         // Making the Get Request
-        Network.request(url: urlString, method: "get") { data, response, error in
+        NetworkManager.shared.request(url: urlString, method: "get") { data, response, error in
             
             // Handle Network/Transport Errors
             if let error = error {

@@ -80,5 +80,5 @@ struct CCTVCameraDetailsView: View {
 }
 
 #Preview {
-    CCTVCameraDetailsView(camera: CCTV(id: UUID(), name: "Main Gate", location: "Main Gate", cctvDescription: "This is a cctv camera and this camera in 2000 years old and this a gift from my forefathers.", videoURL: "http://192.168.100.133:8080/video", isPrivate: false, floorId: UUID()))
+    CCTVCameraDetailsView(camera: CCTV(id: UUID(), name: "Main Gate", location: "Main Gate", cctvDescription: "This is a cctv camera and this camera in 2000 years old and this a gift from my forefathers.", videoURL: "http://192.168.100.133:8080/video", isPrivate: true, floorId: UUID()))
 }

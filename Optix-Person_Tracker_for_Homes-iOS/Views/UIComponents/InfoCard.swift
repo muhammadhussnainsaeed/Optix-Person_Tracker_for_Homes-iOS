@@ -17,7 +17,7 @@ enum InfoCardStyle {
     // Background Color
     var backgroundColor: Color {
         switch self {
-        case .familylog: return Color("custom_light_ blue")
+        case .familylog: return Color("custom_light_blue")
         case .family: return Color("custom_light_blue")
         case .cctv:   return Color("custom_color")
         case .alert:  return Color("custom_blue")
@@ -240,7 +240,7 @@ struct InfoCard: View {
 }
 
 #Preview {
-    InfoCard(cardType: .family, id: UUID(), name: "Room 1", roomName: "Room 1", floorName: "First Floor",description: "This is a room 1 and this is a back door sdfuje fwefwe wefnwe webfwbef weufbwe weufwe wefbwe weufbwe weufwe ", detected_date: "Octcuber 12, 2025", detected_time: "12:00 AM",photo: "",relationship: "Sister", action: {
+    InfoCard(cardType: .familylog, id: UUID(), name: "Room 1", roomName: "Room 1", floorName: "First Floor",description: "This is a room 1 and this is a back door sdfuje fwefwe wefnwe webfwbef weufbwe weufwe wefbwe weufbwe weufwe ", detected_date: "Octcuber 12, 2025", detected_time: "12:00 AM",photo: "",relationship: "Sister", action: {
         print("")
     })
 }

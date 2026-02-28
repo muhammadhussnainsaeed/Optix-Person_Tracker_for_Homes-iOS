@@ -31,7 +31,7 @@ class DashboardCache{
 
 @Model
 final class RecentLogSD {
-    @Attribute(.unique) var logId: String
+    @Attribute(.unique) var logId: UUID
     var detectedAt: String
     var exitedAt: String?
     var snapshotUrl: String
@@ -39,18 +39,20 @@ final class RecentLogSD {
     var room: String
     var floor: String
     var personPhoto: String
+    var eventType: String?
     @Relationship(deleteRule: .cascade) var ObjectInteration: [ObjectInterationSD]?
     //var ObjectInteration: [ObjectInterationSD]?
     
-    init(from apiLog: RecentLog) {
+    init(from apiLog: Logs) {
         self.logId = apiLog.id
         self.detectedAt = apiLog.detectedAt
-        self.snapshotUrl = apiLog.snapshotUrl
+        self.snapshotUrl = apiLog.snapshotURL ?? ""
         self.name = apiLog.name
-        self.room = apiLog.room
-        self.floor = apiLog.floor
-        self.personPhoto = apiLog.photo
-        self.ObjectInteration = apiLog.objectInteraction as? [ObjectInterationSD]    }
+        self.room = apiLog.roomName
+        self.floor = apiLog.floorTitle
+        self.personPhoto = apiLog.personPhoto
+        self.eventType = apiLog.eventType ?? ""
+        self.ObjectInteration = apiLog.interactions as? [ObjectInterationSD]    }
 }
 
 @Model
@@ -58,8 +60,8 @@ final class ObjectInterationSD {
     var objectName: String
     var moved_at: String
     
-    init(from obj: ObjectInteration) {
-        self.objectName = obj.objectName
+    init(from obj: Object) {
+        self.objectName = obj.name
         self.moved_at = obj.movedAt
     }
     
@@ -81,17 +83,18 @@ extension DashboardCache {
 }
 
 extension RecentLogSD {
-    func toStruct() -> RecentLog {
-        return RecentLog(
+    func toStruct() -> Logs {
+        return Logs (
             id: self.logId,
             detectedAt: self.detectedAt,
             exitedAt: nil,
-            snapshotUrl: self.snapshotUrl,
+            snapshotURL: self.snapshotUrl,
             name: self.name,
-            photo: self.personPhoto,
-            room: self.room,
-            floor: self.floor,
-            objectInteraction: self.ObjectInteration as? [ObjectInteration] // SwiftData doesn't store this yet based on your model
+            personPhoto: self.personPhoto,
+            roomName: self.room,
+            floorTitle: self.floor,
+            eventType: self.eventType,
+            interactions: self.ObjectInteration as? [Object] // SwiftData doesn't store this yet based on your model
         )
     }
 }

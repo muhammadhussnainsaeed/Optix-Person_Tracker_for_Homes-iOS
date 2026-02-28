@@ -8,9 +8,11 @@
 import Foundation
 import Combine
 import SwiftUI
+import SwiftData
 
 class SessionManager: ObservableObject {
     
+    @Environment(\.modelContext) private var context
     static let shared = SessionManager()
     
     // MARK: 1, Login Status
@@ -77,6 +79,17 @@ class SessionManager: ObservableObject {
         self.currentName = ""
         self.currentUsername = ""
         self.currentUserID = nil
+//        do {
+//                // Executes a batch delete directly at the SQLite level
+//            try context.delete(model: FamilyMemberCache.self)
+//            try context.delete(model: DashboardCache.self)
+//            try context.delete(model: FamilyMemberCache.self)
+//            try context.delete(model: FloorCache.self)
+//            try context.save()
+//            print("All Caches has been Wiped.")
+//        } catch {
+//            print("Batch delete failed: \(error.localizedDescription)")
+//        }
     }
 }
 

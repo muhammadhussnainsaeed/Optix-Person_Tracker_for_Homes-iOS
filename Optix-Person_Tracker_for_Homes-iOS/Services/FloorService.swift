@@ -8,15 +8,13 @@
 import Foundation
 
 class FloorService {
- 
-    private let Network = NetworkManager()
     
     func fetchAllFloors(username: String, jwtToken: String, userId: String, completion: @escaping (Result<FloorResponse, Error>) -> Void){
        
         let urlString = "/floor/fetch_all?username=\(username)&jwt_token=\(jwtToken)&user_id=\(userId)"
         
         // Making the Get Request
-        Network.request(url: urlString, method: "get") { data, response, error in
+        NetworkManager.shared.request(url: urlString, method: "get") { data, response, error in
             
             // Handle Network/Transport Errors
             if let error = error {

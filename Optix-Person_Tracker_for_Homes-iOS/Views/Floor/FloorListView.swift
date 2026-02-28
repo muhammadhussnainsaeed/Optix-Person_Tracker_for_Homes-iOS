@@ -142,7 +142,17 @@ struct FloorListView: View {
             }
         }
         .sheet(item: $floorObjectForDetails) { floor in
-            Text("Details for \(floor.title)")
+            VStack{
+                NetworkVideoPlayer(videoURL: URL(string: "http://192.168.100.8:8000/media/snapshots/snapshot_family.mp4")!)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 180)
+                    .background(Color.black)
+                    .cornerRadius(20)
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 0)
+                    .aspectRatio(16/9, contentMode: .fit)
+                    .padding()
+                Text("Details for \(floor.title)")
+            }
                 .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $isShowingAddFloorSheet) {

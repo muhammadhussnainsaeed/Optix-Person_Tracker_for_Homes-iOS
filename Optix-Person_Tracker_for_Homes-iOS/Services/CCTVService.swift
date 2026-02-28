@@ -10,15 +10,13 @@ import SwiftUI
 
 class CCTVService {
     
-    private let Network = NetworkManager()
-    
     // To fetch all the cameras of the user
     func fetchAllCameras(username: String, jwtToken: String, userId: String, completion: @escaping (Result<CCTVResponse, Error>) -> Void){
         
         let urlString = "/camera/fetch_all?username=\(username)&jwt_token=\(jwtToken)&user_id=\(userId)"
         
         // Making the Get Request
-        Network.request(url: urlString, method: "get") { data, response, error in
+        NetworkManager.shared.request(url: urlString, method: "get") { data, response, error in
             
             // Handle Network/Transport Errors
             if let error = error {
@@ -83,7 +81,7 @@ class CCTVService {
         let urlString = "/camera/graph?username=\(username)&jwt_token=\(jwtToken)&user_id=\(userId)"
         
         // Making the Get Request
-        Network.request(url: urlString, method: "get") { data, response, error in
+        NetworkManager.shared.request(url: urlString, method: "get") { data, response, error in
             
             // Handle Network/Transport Errors
             if let error = error {
@@ -147,7 +145,7 @@ class CCTVService {
         
         let credentials: [String: Any] = ["user_id": userId, "username": username, "camera_id": cameraToUpdate.id.uuidString, "name": cameraToUpdate.name, "location": cameraToUpdate.name, "video_url": cameraToUpdate.videoURL, "description": cameraToUpdate.cctvDescription, "is_private": cameraToUpdate.isPrivate, "jwt_token": jwtToken, "floor_id": cameraToUpdate.floorId.uuidString]
         
-        Network.request(url: "/camera/update", method: "put", body: credentials) {
+        NetworkManager.shared.request(url: "/camera/update", method: "put", body: credentials) {
             data, response, error in
             
             if let error = error {
@@ -207,7 +205,7 @@ class CCTVService {
      
         let credentials: [String: Any] = ["user_id": userId, "username": username, "camera_id": cameraId.uuidString, "jwt_token": jwtToken]
         
-        Network.request(url: "/camera/delete", method: "delete", body: credentials) {
+        NetworkManager.shared.request(url: "/camera/delete", method: "delete", body: credentials) {
             data, response, error in
             
             if let error = error {
@@ -268,7 +266,7 @@ class CCTVService {
         let urlString = "/camera/network/fetch?username=\(username)&jwt_token=\(jwtToken)&camera_id=\(cameraId)"
         
         // Making the Get Request
-        Network.request(url: urlString, method: "get") { data, response, error in
+        NetworkManager.shared.request(url: urlString, method: "get") { data, response, error in
             
             // Handle Network/Transport Errors
             if let error = error {
@@ -334,7 +332,7 @@ class CCTVService {
         
         let credentials: [String: Any] = ["user_id": userId, "username": username, "jwt_token": jwtToken, "camera_id": cameraId, "connected_camera_id" : cameraListString]
         
-        Network.request(url: "/camera/network/update", method: "put", body: credentials) {
+        NetworkManager.shared.request(url: "/camera/network/update", method: "put", body: credentials) {
             data, response, error in
             
             if let error = error {

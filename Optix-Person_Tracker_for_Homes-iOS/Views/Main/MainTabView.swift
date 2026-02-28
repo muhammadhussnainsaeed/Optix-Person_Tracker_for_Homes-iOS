@@ -53,11 +53,12 @@ struct MainTabView: View {
             
             // TAB 5: SETTINGS
             NavigationStack {
-                Button {
-                    SessionManager.shared.logout()
-                } label: {
-                    Text("Logout")
-                }
+                SettingsView()
+//                Button {
+//                    SessionManager.shared.logout()
+//                } label: {
+//                    Text("Logout")
+//                }
             }
             .tag(AppTab.settings)
             .tabItem {

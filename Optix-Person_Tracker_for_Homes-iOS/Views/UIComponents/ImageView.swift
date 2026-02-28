@@ -11,7 +11,7 @@ struct ImageView: View {
     
     let urlString: String?
     let localImage: UIImage?
-    let baseURL = "http://192.168.100.8:8888/"
+    let baseURL = "http://192.168.100.8:8000/"
     
     var fullURL: URL? {
         guard let path = urlString, !path.isEmpty else { return nil }

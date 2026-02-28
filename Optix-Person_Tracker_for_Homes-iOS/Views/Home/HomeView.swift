@@ -9,6 +9,9 @@ struct HomeView: View {
     
     @StateObject var homeViewModelObject = HomeViewModel()
     
+    @State var familyLogObjectForDetails: Logs?
+    @State var unwantedLogObjectForDetails: Logs?
+    
     var currentDateString: String {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "EEEE, d MMM YYY"
@@ -64,18 +67,19 @@ struct HomeView: View {
                     // Family Log (Safe Unwrap)
                     if let familyLog = dashboard.recentFamilyLog {
                         InfoCard(
-                            cardType: .family,
-                            id: UUID(uuidString: familyLog.id) ?? UUID(),
+                            cardType: .familylog,
+                            id: familyLog.id,
                             name: familyLog.name,
-                            roomName: familyLog.room,
-                            floorName: familyLog.floor,
+                            roomName: familyLog.roomName,
+                            floorName: familyLog.floorTitle,
                             description: "",
                             // FIX: Use AppFormatter correctly (static calls)
                             detected_date: AppFormatter.shared.getFormattedDate(from: familyLog.detectedAt),
                             detected_time: AppFormatter.shared.getFormattedTime(from: familyLog.detectedAt),
-                            photo: familyLog.photo, relationship: ""
+                            photo: familyLog.personPhoto, relationship: ""
                         ) {
-                            print("")
+                            familyLogObjectForDetails = familyLog
+                            print(familyLog)
                         }
                         .padding(.horizontal, 30)
                         .padding(.bottom, 7)
@@ -85,14 +89,14 @@ struct HomeView: View {
                     if let unwantedLog = dashboard.recentUnwantedLog {
                         InfoCard(
                             cardType: .alert,
-                            id: UUID(uuidString: unwantedLog.id) ?? UUID(),
+                            id: unwantedLog.id,
                             name: unwantedLog.name,
-                            roomName: unwantedLog.room,
-                            floorName: unwantedLog.floor,
+                            roomName: unwantedLog.roomName,
+                            floorName: unwantedLog.floorTitle,
                             description: "",
                             detected_date: AppFormatter.shared.getFormattedDate(from: unwantedLog.detectedAt),
                             detected_time: AppFormatter.shared.getFormattedTime(from: unwantedLog.detectedAt),
-                            photo: unwantedLog.photo, relationship: ""
+                            photo: unwantedLog.personPhoto, relationship: ""
                         ) {
                             print("")
                         }
@@ -168,6 +172,10 @@ struct HomeView: View {
             {
                 await homeViewModelObject.getDashboardStats(context: context)
             }
+        }
+        .sheet(item: $familyLogObjectForDetails) { LogObject in
+            FamilyLogDetailsView(member: LogObject)
+                .presentationDragIndicator(.visible)
         }
     }
 }

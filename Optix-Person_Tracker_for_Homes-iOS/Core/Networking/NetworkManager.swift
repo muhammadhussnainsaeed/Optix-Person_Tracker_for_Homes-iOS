@@ -8,7 +8,10 @@
 import Foundation
 
 class NetworkManager{
-    let baseURL = "http://192.168.100.8:8888"
+    
+    static let shared = NetworkManager()
+    
+    let baseURL = "http://192.168.100.8:8000"
     
     //This function will deal requests having nil body and body data
     func request(url: String, method: String, body: [String: Any]? = nil, completion: @escaping (Data?, URLResponse?, Error?) -> Void) {

@@ -273,7 +273,7 @@ struct AddUpdateFamilyMemberView: View {
         if isUpdate, let serverPath = getPhotoURL(at: index) {
             
             // Construct full URL (Ensure this matches your baseURL logic)
-            let baseURL = "http://192.168.100.8:8888/"
+            let baseURL = "http://192.168.100.8:8000/"
             guard let url = URL(string: baseURL + serverPath) else { return (index, nil) }
             
             do {

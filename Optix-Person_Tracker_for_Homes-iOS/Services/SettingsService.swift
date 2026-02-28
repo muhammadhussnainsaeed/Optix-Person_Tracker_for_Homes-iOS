@@ -1,23 +1,23 @@
 //
-//  AuthService.swift
+//  SettingsService.swift
 //  Optix-Person_Tracker_for_Homes-iOS
 //
-//  Created by Hussnain on 17/1/26.
+//  Created by Hussnain on 23/2/26.
 //
 
-import Foundation
+import SwiftUI
 
-class AuthService{
+class SettingsService {
     
-    func login(username: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
+    func updateName(username: String, jwtToken: String, userId: String, name: String, completion: @escaping (Result<UpdateNameResponse, Error>) -> Void) {
         
-        let credentials = ["username": username, "password": password]
+        let credentials: [String: Any] = ["user_id": userId, "username": username, "jwt_token": jwtToken, "name": name]
         
-        NetworkManager.shared.request(url: "/auth/log_in", method: "post", body: credentials) { data, response, error in
+        NetworkManager.shared.request(url: "/settings/update_name", method: "put", body: credentials) {
+            data, response, error in
             
-            // Check for Network Errors First (No Internet, etc.)
             if let error = error {
-                print("Login network failed: \(error)")
+                print("Network failed: \(error)")
                 completion(.failure(error))
                 return
             }
@@ -48,7 +48,7 @@ class AuthService{
             
             // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
             guard let data = data else {
-                let noDataError = NSError(domain: "Auth", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                let noDataError = NSError(domain: "Upadte Name", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
                 completion(.failure(noDataError))
                 return
             }
@@ -56,8 +56,8 @@ class AuthService{
             do {
                 let decoder = JSONDecoder()
                 // Use this if your backend uses
-                let user = try decoder.decode(User.self, from: data)
-                completion(.success(user))
+                let responseData = try decoder.decode(UpdateNameResponse.self, from: data)
+                completion(.success(responseData))
             } catch {
                 print("Decoding failed: \(error)")
                 if let str = String(data: data, encoding: .utf8) {
@@ -68,15 +68,15 @@ class AuthService{
         }
     }
     
-    func signup(name: String, username: String, password: String,security_question: String,security_answer: String, completion: @escaping (Result<SignupUserResponse, Error>) -> Void) {
+    func updatePassword(username: String, jwtToken: String, userId: String, oldPassword: String, newPassword: String, completion: @escaping (Result<UpdatePasswordResponse, Error>) -> Void) {
         
-        let credentials = ["name": name, "username": username, "password": password, "security_question": security_question, "security_answer": security_answer]
+        let credentials: [String: Any] = ["user_id": userId, "username": username, "old_password": oldPassword, "new_password": newPassword, "jwt_token": jwtToken]
         
-        NetworkManager.shared.request(url: "/auth/sign_up", method: "post", body: credentials) { data, response, error in
+        NetworkManager.shared.request(url: "/settings/update_password", method: "put", body: credentials) {
+            data, response, error in
             
-            // Check for Network Errors First (No Internet, etc.)
             if let error = error {
-                print("Signup network failed: \(error)")
+                print("Network failed: \(error)")
                 completion(.failure(error))
                 return
             }
@@ -107,7 +107,7 @@ class AuthService{
             
             // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
             guard let data = data else {
-                let noDataError = NSError(domain: "Auth", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                let noDataError = NSError(domain: "Upadte Name", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
                 completion(.failure(noDataError))
                 return
             }
@@ -115,8 +115,8 @@ class AuthService{
             do {
                 let decoder = JSONDecoder()
                 // Use this if your backend uses
-                let user = try decoder.decode(SignupUserResponse.self, from: data)
-                completion(.success(user))
+                let responseData = try decoder.decode(UpdatePasswordResponse.self, from: data)
+                completion(.success(responseData))
             } catch {
                 print("Decoding failed: \(error)")
                 if let str = String(data: data, encoding: .utf8) {
@@ -127,15 +127,15 @@ class AuthService{
         }
     }
     
-    func resetUserPassword(username: String,security_question: String,security_answer: String, new_password: String, completion: @escaping (Result<SignupUserResponse, Error>) -> Void) {
+    func updateSecurityQuestion(username: String, jwtToken: String, userId: String, password: String, securityQuestion: String, securityAnswer: String, completion: @escaping (Result<UpdateSecurityQuestionResponse, Error>) -> Void) {
         
-        let credentials = ["username": username, "security_question": security_question, "security_answer": security_answer, "new_password": new_password]
+        let credentials: [String: Any] = ["user_id": userId, "username": username, "password": password, "security_question": securityQuestion, "security_answer": securityAnswer, "jwt_token": jwtToken]
         
-        NetworkManager.shared.request(url: "/auth/reset_password", method: "post", body: credentials) { data, response, error in
+        NetworkManager.shared.request(url: "/settings/update_security_question_answer", method: "put", body: credentials) {
+            data, response, error in
             
-            // Check for Network Errors First (No Internet, etc.)
             if let error = error {
-                print("Reset Password network failed: \(error)")
+                print("Network failed: \(error)")
                 completion(.failure(error))
                 return
             }
@@ -166,7 +166,7 @@ class AuthService{
             
             // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
             guard let data = data else {
-                let noDataError = NSError(domain: "Auth", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                let noDataError = NSError(domain: "Update Q&A", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
                 completion(.failure(noDataError))
                 return
             }
@@ -174,8 +174,8 @@ class AuthService{
             do {
                 let decoder = JSONDecoder()
                 // Use this if your backend uses
-                let user = try decoder.decode(SignupUserResponse.self, from: data)
-                completion(.success(user))
+                let responseData = try decoder.decode(UpdateSecurityQuestionResponse.self, from: data)
+                completion(.success(responseData))
             } catch {
                 print("Decoding failed: \(error)")
                 if let str = String(data: data, encoding: .utf8) {
