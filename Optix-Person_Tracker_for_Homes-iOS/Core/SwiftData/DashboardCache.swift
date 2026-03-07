@@ -34,7 +34,7 @@ final class RecentLogSD {
     @Attribute(.unique) var logId: UUID
     var detectedAt: String
     var exitedAt: String?
-    var snapshotUrl: String
+    var snapshotUrl: String?
     var name: String
     var room: String
     var floor: String
@@ -52,7 +52,8 @@ final class RecentLogSD {
         self.floor = apiLog.floorTitle
         self.personPhoto = apiLog.personPhoto
         self.eventType = apiLog.eventType ?? ""
-        self.ObjectInteration = apiLog.interactions as? [ObjectInterationSD]    }
+        self.ObjectInteration = apiLog.interactions as? [ObjectInterationSD]
+    }
 }
 
 @Model

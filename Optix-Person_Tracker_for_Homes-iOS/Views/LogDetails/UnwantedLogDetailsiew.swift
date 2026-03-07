@@ -8,14 +8,18 @@
 import SwiftUI
 
 struct UnwantedLogDetailsiew: View {
-    let unwawntedPerson: Logs
+    
+    @State var unwantedPersonLogs : [Logs]? = []
+    @State var unwantedPerson: Logs
     let baseURL: String = "http://192.168.100.8:8000/"
+    
+    @StateObject var alertsViewModelObject = AlertsViewModel()
     
     var body: some View {
         NavigationStack {
             ScrollView{
                 VStack{
-                    if unwawntedPerson.snapshotURL == "" || true {
+                    if unwantedPerson.snapshotURL == "" {
                         Rectangle()
                             .frame(maxWidth: .infinity)
                             .frame(height: 180)
@@ -35,7 +39,7 @@ struct UnwantedLogDetailsiew: View {
                             }
                     }
                     else{
-                        NetworkVideoPlayer(videoURL: URL(string: baseURL)!.appendingPathComponent(unwawntedPerson.snapshotURL ?? ""))
+                        NetworkVideoPlayer(videoURL: URL(string: baseURL)!.appendingPathComponent(unwantedPerson.snapshotURL ?? ""))
                             .aspectRatio(16/9, contentMode: .fit)
                             .frame(maxWidth: .infinity)
                             .frame(height: 180)
@@ -45,7 +49,7 @@ struct UnwantedLogDetailsiew: View {
                     }
                     VStack(alignment: .leading){
                         HStack{
-                            Text("\(Text(unwawntedPerson.name).fontWeight(.bold)) is spotted in \(Text(unwawntedPerson.roomName).fontWeight(.bold)) on the \(Text(unwawntedPerson.floorTitle).fontWeight(.bold)).")
+                            Text("\(Text(unwantedPerson.name).fontWeight(.bold)) is spotted in \(Text(unwantedPerson.roomName).fontWeight(.bold)) on the \(Text(unwantedPerson.floorTitle).fontWeight(.bold)).")
                                  .font(.caption)
                                  //.foregroundColor()
                                  .lineLimit(2)
@@ -56,17 +60,17 @@ struct UnwantedLogDetailsiew: View {
                         Text("Entered:")
                             .bold()
                         HStack{
-                            Text("\(AppFormatter.shared.getFormattedDate(from: unwawntedPerson.detectedAt))")
+                            Text("\(AppFormatter.shared.getFormattedDate(from: unwantedPerson.detectedAt))")
                             Spacer()
-                            Text("\(AppFormatter.shared.getFormattedTime(from: unwawntedPerson.detectedAt))")
+                            Text("\(AppFormatter.shared.getFormattedTime(from: unwantedPerson.detectedAt))")
                         }
-                        if unwawntedPerson.exitedAt != nil {
+                        if unwantedPerson.exitedAt != nil {
                             Text("Exited:")
                                 .bold()
                             HStack{
-                                Text("\(AppFormatter.shared.getFormattedDate(from: unwawntedPerson.exitedAt!))")
+                                Text("\(AppFormatter.shared.getFormattedDate(from: unwantedPerson.exitedAt!))")
                                 Spacer()
-                                Text("\(AppFormatter.shared.getFormattedTime(from: unwawntedPerson.exitedAt!))")
+                                Text("\(AppFormatter.shared.getFormattedTime(from: unwantedPerson.exitedAt!))")
                             }
                         }
                     }
@@ -79,9 +83,10 @@ struct UnwantedLogDetailsiew: View {
                     .padding(.top, 50)
                     .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 0)
                     
-                    VStack(alignment: .leading){
-                        if unwawntedPerson.interactions != nil {
-                            HStack{
+                    VStack(alignment: .leading) {
+                        // Safely unwrap the interactions and check that it is not empty
+                        if let interactions = unwantedPerson.interactions, !interactions.isEmpty {
+                            HStack {
                                 Text("Interactions")
                                     .bold()
                                     .padding(.horizontal, 10)
@@ -89,13 +94,43 @@ struct UnwantedLogDetailsiew: View {
                                     .font(.footnote)
                                 Spacer()
                             }
-                            ForEach(unwawntedPerson.interactions!, id: \.self) {
-                                object in
-                                ObjectCard(object: object, backgroundColor: "custom_blue", fontColor: .white)
+                            
+                            // Safely iterate without using !
+                            ForEach(interactions, id: \.self) { object in
+                                ObjectCard(object: object, backgroundColor: "custom_blue", fontColor: .primary)
                             }
                         }
                     }
-                    //.font(.caption2)
+                    .padding(.bottom, 20)
+                    
+                    VStack(alignment: .leading){
+                        if unwantedPersonLogs != nil{
+                            ForEach(unwantedPersonLogs!, id: \.id){
+                                log in
+                                InfoCard(
+                                    cardType: .alert,
+                                    id: log.id,
+                                    name: log.name,
+                                    roomName: log.roomName,
+                                    floorName: log.floorTitle,
+                                    description: "",
+                                    detected_date: AppFormatter.shared.getFormattedDate(from: log.detectedAt),
+                                    detected_time: AppFormatter.shared.getFormattedTime(from: log.detectedAt),
+                                    photo: log.personPhoto,
+                                    relationship: ""
+                                ) {
+                                    
+                                    let previousPerson = unwantedPerson
+                                    
+                                    unwantedPerson = log
+                                    
+                                    unwantedPersonLogs?.removeAll { $0.id == log.id }
+                                    
+                                    unwantedPersonLogs?.append(previousPerson)
+                                }
+                            }
+                        }
+                    }
                 }
                 .padding(.top, 15)
                 .padding(.horizontal,30)
@@ -106,13 +141,18 @@ struct UnwantedLogDetailsiew: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear(){
+            Task{
+                await alertsViewModelObject.fetchUnwantedPersonLogs(logId: unwantedPerson.id)
+                unwantedPersonLogs = alertsViewModelObject.unwantedPersonLogs
+            }
             
+            print(unwantedPerson)
         }
     }
 }
 
 #Preview {
-    UnwantedLogDetailsiew(unwawntedPerson: Logs(
+    UnwantedLogDetailsiew(unwantedPerson: Logs(
         id: UUID(uuidString: "2419a166-a252-4624-84a3-c2f3816761b9")!,
         detectedAt: "2025-12-14T10:32:32.527518+05:00",
         exitedAt: "2025-12-14T13:02:32.527518+05:00",

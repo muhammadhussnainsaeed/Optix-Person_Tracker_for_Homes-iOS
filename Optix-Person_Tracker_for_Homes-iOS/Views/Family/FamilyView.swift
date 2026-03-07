@@ -18,6 +18,7 @@ struct FamilyView: View {
     @State private var alertMessage : String = ""
     @State private var error: Bool = false
     
+    @State var familyLogObjectForDetails: Logs?
     @State var memberObjectForDetails: Family?
     @State var memberObjectForUpdate: Family?
     @State var memberObjectForDelete: Family?
@@ -28,6 +29,11 @@ struct FamilyView: View {
     var topFamilyMembers: [Family] {
         // This grabs the first 3. If there are only 2, it grabs 2. No crash.
         Array(familyViewModelObject.familyMemberList.prefix(3))
+    }
+    
+    var topFamilyMemberLogs: [Logs] {
+        // This grabs the first 3. If there are only 2, it grabs 2. No crash.
+        Array(familyViewModelObject.familyMemberLogsList.prefix(3))
     }
     
     var body: some View {
@@ -42,7 +48,7 @@ struct FamilyView: View {
                     Text("Family Members")
                     Spacer()
                     Button {
-                        isShowingSheetFamilyList = true
+                        isShowingSheetFamilyList.toggle()
                         print("View All")
                     } label: {
                         HStack{
@@ -78,7 +84,7 @@ struct FamilyView: View {
                 }
                 else{
                     
-                    // USE FOREACH (Safely loops through topCameras)
+                    // USE FOREACH (Safely loops through topFamilyMembers)
                     ForEach(topFamilyMembers) { member in
                         InfoCard(cardType: .family, id: member.id, name: member.name, roomName: "", floorName: "", description: "", detected_date: "", detected_time: "", photo: "\(member.photos[0].photo)", relationship: member.relationship) {
                             print("Tapped \(member.name)")
@@ -126,7 +132,7 @@ struct FamilyView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 20)
                 
-                if true {
+                if topFamilyMemberLogs.isEmpty {
                     VStack{
                         HStack(spacing: 10) {
                             Image(systemName: "text.page.slash")
@@ -145,18 +151,17 @@ struct FamilyView: View {
                     }
                     .padding(.bottom, 50)
                 }
-//                else{
-//                    
-//                    // USE FOREACH (Safely loops through bottomCameras)
-//                    ForEach(topCameras) { camera in
-//                        InfoCard(cardType: .cctv, id: camera.id, name: camera.name, roomName: "", floorName: "", description: camera.cctvDescription, detected_date: "", detected_time: "", photo: "") {
-//                            cameraForNetwork = camera
-//                            print("Tapped \(camera.name)")
-//                        }
-//                        .padding(.horizontal, 30)
-//                        .padding(.bottom, 7)
-//                    }
-//                }
+                else{
+                    
+                    // USE FOREACH (Safely loops through bottomCameras)
+                    ForEach(topFamilyMemberLogs) { log in
+                        InfoCard(cardType: .familylog, id: log.id, name: log.name, roomName: log.roomName, floorName: log.floorTitle, description: "", detected_date: AppFormatter.shared.getFormattedDate(from: log.detectedAt), detected_time: AppFormatter.shared.getFormattedTime(from: log.detectedAt), photo: log.personPhoto, relationship: "") {
+                            familyLogObjectForDetails = log
+                        }
+                        .padding(.horizontal, 30)
+                        .padding(.bottom, 7)
+                    }
+                }
                 
                 // Bottom Padding for TabBar
                 Color.clear.frame(height: 140)
@@ -253,7 +258,11 @@ struct FamilyView: View {
                         .presentationDragIndicator(.visible)
                 }
         .sheet(isPresented: $isShowingSheetFamilyList, content: {
-            FamilyListView() 
+            FamilyMemberListView()
+                .presentationDragIndicator(.visible)
+        })
+        .sheet(isPresented: $isShowingSheetFamilyLogsList, content: {
+            FamilyMemberLogListView()
                 .presentationDragIndicator(.visible)
         })
         .sheet(isPresented: $isShowingSheetAddMember, content: {
@@ -263,11 +272,17 @@ struct FamilyView: View {
         .onAppear(){
             Task{
                 await familyViewModelObject.fetchFamilyMemberList(context: context)
+                await familyViewModelObject.fetchFamilyMembersLogList(context: context)
             }
+        }
+        .sheet(item: $familyLogObjectForDetails) { LogObject in
+            FamilyLogDetailsView(member: LogObject)
+                .presentationDragIndicator(.visible)
         }
         .refreshable {
             Task{
                 await familyViewModelObject.fetchFamilyMemberList(context: context)
+                await familyViewModelObject.fetchFamilyMembersLogList(context: context)
             }
         }
     }

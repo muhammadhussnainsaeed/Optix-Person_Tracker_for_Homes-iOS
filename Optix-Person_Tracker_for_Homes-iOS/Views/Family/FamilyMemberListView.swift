@@ -1,13 +1,13 @@
 //
-//  FamilyListView.swift
+//  FamilyMemberListView.swift
 //  Optix-Person_Tracker_for_Homes-iOS
 //
-//  Created by Hussnain on 11/2/26.
+//  Created by Hussnain on 1/3/26.
 //
 
 import SwiftUI
 
-struct FamilyListView: View {
+struct FamilyMemberListView: View {
     
     @StateObject var familyViewModelObject = FamilyViewModel()
     @Environment(\.modelContext) private var context
@@ -25,7 +25,7 @@ struct FamilyListView: View {
         NavigationStack {
             ZStack{
                 ScrollView {
-                    VStack(spacing: 12) { // Add consistent spacing
+                    VStack(spacing: 12) {
                         
                         if familyViewModelObject.familyMemberList.isEmpty {
                             // Cleaner Empty State
@@ -116,7 +116,7 @@ struct FamilyListView: View {
             Button("OK", role: .cancel) {
                 if error {
                     error.toggle()
-                }                
+                }
             }
         } message: {
             Text(alertMessage)
@@ -144,5 +144,5 @@ struct FamilyListView: View {
 }
 
 #Preview {
-    FamilyListView()
+    FamilyMemberListView()
 }

@@ -49,4 +49,20 @@ class AppFormatter {
             }
             return timeOutputFormatter.string(from: date)
         }
+    
+    private let apiOutputFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            // Matches your database requirement exactly
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZZZZ"
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            
+            // CRITICAL: Notice we are NOT setting timeZone = TimeZone(secondsFromGMT: 0) here.
+            // We want it to use the device's local timezone so it correctly attaches the +05:00 offset!
+            return formatter
+        }()
+        
+        // 5. Convert Swift Date to Database String
+        func getDatabaseFormattedString(from date: Date) -> String {
+            return apiOutputFormatter.string(from: date)
+        }
 }

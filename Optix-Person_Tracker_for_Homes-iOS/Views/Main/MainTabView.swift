@@ -44,7 +44,7 @@ struct MainTabView: View {
             
             // TAB 4: ALERTS
             NavigationStack {
-                Text("Alerts")
+                AlertsView()
             }
             .tag(AppTab.alerts)
             .tabItem {
@@ -54,11 +54,6 @@ struct MainTabView: View {
             // TAB 5: SETTINGS
             NavigationStack {
                 SettingsView()
-//                Button {
-//                    SessionManager.shared.logout()
-//                } label: {
-//                    Text("Logout")
-//                }
             }
             .tag(AppTab.settings)
             .tabItem {

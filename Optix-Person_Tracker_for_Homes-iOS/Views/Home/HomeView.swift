@@ -12,6 +12,8 @@ struct HomeView: View {
     @State var familyLogObjectForDetails: Logs?
     @State var unwantedLogObjectForDetails: Logs?
     
+    @State var isShowingSheetInvestigate: Bool = false
+    
     var currentDateString: String {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "EEEE, d MMM YYY"
@@ -98,7 +100,7 @@ struct HomeView: View {
                             detected_time: AppFormatter.shared.getFormattedTime(from: unwantedLog.detectedAt),
                             photo: unwantedLog.personPhoto, relationship: ""
                         ) {
-                            print("")
+                            unwantedLogObjectForDetails = unwantedLog
                         }
                         .padding(.horizontal, 30)
                     }
@@ -159,6 +161,21 @@ struct HomeView: View {
                     Spacer()
                 }
                 Spacer()
+                HStack{
+                    Spacer()
+                    Button {
+                        isShowingSheetInvestigate.toggle()
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .font(.title2)
+                            .bold()
+                            .frame(width: 40, height: 50)
+                    }
+                    .padding(.horizontal, 30)
+                    .padding(.vertical, 30)
+                    .buttonStyle(.glassProminent)
+                    .tint(Color("custom_blue"))
+                }
             }
         }
         .onAppear {
@@ -177,6 +194,14 @@ struct HomeView: View {
             FamilyLogDetailsView(member: LogObject)
                 .presentationDragIndicator(.visible)
         }
+        .sheet(item: $unwantedLogObjectForDetails) { LogObject in
+            UnwantedLogDetailsiew(unwantedPerson: LogObject)
+                .presentationDragIndicator(.visible)
+        }
+        .navigationDestination(isPresented: $isShowingSheetInvestigate, destination: {
+            InvestigateView()
+                .navigationBarBackButtonHidden()
+        })
     }
 }
 

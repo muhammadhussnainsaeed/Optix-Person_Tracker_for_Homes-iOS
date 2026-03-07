@@ -14,7 +14,7 @@ struct FamilyLogDetailsView: View {
         NavigationStack {
             ScrollView{
                 VStack{
-                    if member.snapshotURL == "" {
+                    if member.snapshotURL == "" || member.snapshotURL == nil {
                         Rectangle()
                             .frame(maxWidth: .infinity)
                             .font(.caption)

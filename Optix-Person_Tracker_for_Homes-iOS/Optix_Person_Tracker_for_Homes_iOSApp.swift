@@ -57,7 +57,11 @@ struct Optix_Person_Tracker_for_Homes_iOSApp: App {
                                 ObjectInterationSD.self,
                                 CCTVCache.self,
                                 FloorCache.self,
-                                FamilyMemberCache.self
+                                FamilyMemberCache.self,
+                                LogsCache.self,
+                                FamilyMemberLogCache.self,
+                                UnwantedPersonLogCache.self,
+                                ObjectsCache.self
                             ])
                     } else {
                         LoginView()

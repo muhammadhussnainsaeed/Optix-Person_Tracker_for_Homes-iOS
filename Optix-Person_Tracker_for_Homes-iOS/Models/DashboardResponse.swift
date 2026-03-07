@@ -23,37 +23,3 @@ struct DashboardResponse: Codable{
         case recentUnwantedLog = "recent_unwanted_log"
     }
 }
-
-//struct ObjectInteration: Codable{
-//    let objectName: String
-//    let movedAt: String
-//    
-//    enum CodingKeys: String, CodingKey {
-//        case objectName = "object_name"
-//        case movedAt = "moved_at"
-//    }
-//}
-//
-//struct RecentLog: Codable, Identifiable {
-//    let id: UUID
-//    let detectedAt: String
-//    let exitedAt: String?
-//    let snapshotUrl: String
-//    let name: String
-//    let photo: String
-//    let room: String
-//    let floor: String
-//    let objectInteraction: [ObjectInteration]?
-//        
-//    enum CodingKeys: String, CodingKey {
-//        case id
-//        case detectedAt = "detected_at"
-//        case exitedAt = "exited_at"
-//        case snapshotUrl = "snapshot_url"
-//        case name = "name"
-//        case photo = "person_photo"
-//        case room = "room"
-//        case floor = "floor"
-//        case objectInteraction = "object_interaction"
-//    }
-//}

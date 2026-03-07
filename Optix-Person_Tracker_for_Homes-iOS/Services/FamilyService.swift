@@ -249,7 +249,7 @@ class FamilyService {
         }
     }
     
-    func fetchAllFamilyMembersLogs(username: String, jwtToken: String, userId: String, completion: @escaping (Result<FamilyMemberResponse, Error>) -> Void){
+    func fetchAllFamilyMembersLogs(username: String, jwtToken: String, userId: String, completion: @escaping (Result<LogsResponse, Error>) -> Void){
         
         let urlString = "/logs/family_member/fetch_all?username=\(username)&jwt_token=\(jwtToken)&user_id=\(userId)"
         
@@ -287,7 +287,7 @@ class FamilyService {
             
             // Handle Success Data Decoding
             guard let data = data else {
-                let noDataError = NSError(domain: "Family Member List", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                let noDataError = NSError(domain: "Family Member Logs List", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
                 completion(.failure(noDataError))
                 return
             }
@@ -296,10 +296,10 @@ class FamilyService {
                 let decoder = JSONDecoder()
                 
                 // Decodeing DashboardResponse
-                let familyMemberListData = try decoder.decode(FamilyMemberResponse.self, from: data)
+                let familyMemberLogsListData = try decoder.decode(LogsResponse.self, from: data)
                 
                 // Success
-                completion(.success(familyMemberListData))
+                completion(.success(familyMemberLogsListData))
                 
             } catch {
                 print("Decoding failed: \(error)")
