@@ -142,6 +142,37 @@ class CCTVViewModel: ObservableObject {
         }
     }
     
+    // Creating the Camera
+    func createCamera(cctvObjectForUpadte: CCTV) async{
+        
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                cctvServiceObject.createCamera(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", cameraToCreate: cctvObjectForUpadte) { result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+            
+            self.cctvResponseForCamera = fetchedData
+            
+            print("\(fetchedData)")
+            
+            self.isLoading = false
+            print("Camera has been updated")
+            
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+            
+        }
+    }
+    
     // Updating the Camera
     func updateCamera(cctvObjectForUpadte: CCTV) async{
         
@@ -213,7 +244,7 @@ class CCTVViewModel: ObservableObject {
         do {
             let fetchedData = try await withCheckedThrowingContinuation { continuation in
                 cctvServiceObject.fetchCameraNetwork(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", cameraId: cameraId.uuidString)
-                    { result in
+                { result in
                     switch result {
                     case .success(let data): continuation.resume(returning: data)
                     case .failure(let error): continuation.resume(throwing: error)
@@ -267,5 +298,6 @@ class CCTVViewModel: ObservableObject {
             
         }
     }
+    
 }
 

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FamilyLogDetailsView: View {
     let member: Logs
-    let baseURL: String = "http://192.168.100.8:8000/"
+    let baseURL: String = "http://192.168.100.8:8080/"
     var body: some View {
         NavigationStack {
             ScrollView{

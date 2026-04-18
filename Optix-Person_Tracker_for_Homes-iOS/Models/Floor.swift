@@ -27,3 +27,35 @@ struct FloorResponse: Codable {
         case floorList = "Floors"
     }
 }
+
+struct addUpdateFloorPlanResponse: Codable{
+    let message: String
+    let id: String
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+        case id
+    }
+}
+
+struct addUpdateFloorResponse: Codable {
+    let message: String
+    let id: String
+    let title: String
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+        case id
+        case title
+    }
+}
+
+struct FloorPlan : Codable {
+    let message: String
+    let plan: String
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+        case plan
+    }
+}

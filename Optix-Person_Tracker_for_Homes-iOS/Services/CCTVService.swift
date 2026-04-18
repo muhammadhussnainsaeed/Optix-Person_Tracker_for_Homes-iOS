@@ -140,6 +140,66 @@ class CCTVService {
         
     }
     
+    // To create the camera
+    func createCamera(username: String, jwtToken: String, userId: String, cameraToCreate: CCTV, completion: @escaping (Result<CCTVResponseForUpdateDelete, Error>) -> Void){
+        
+        let credentials: [String: Any] = ["user_id": userId, "username": username, "name": cameraToCreate.name, "location": cameraToCreate.name, "video_url": cameraToCreate.videoURL, "description": cameraToCreate.cctvDescription, "is_private": cameraToCreate.isPrivate, "jwt_token": jwtToken, "floor_id": cameraToCreate.floorId.uuidString]
+        
+        NetworkManager.shared.request(url: "/camera/add", method: "post", body: credentials) {
+            data, response, error in
+            
+            if let error = error {
+                print("Network failed: \(error)")
+                completion(.failure(error))
+                return
+            }
+            
+            // Check HTTP Status Code
+            if let httpResponse = response as? HTTPURLResponse {
+                
+                // If status is NOT success (e.g., 400, 401, 500)
+                if !(200...299).contains(httpResponse.statusCode) {
+                    
+                    // Attempt to decode the specific "detail" from the backend
+                    if let data = data,
+                       let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let detail = errorJson["detail"] as? String {
+                        
+                        let apiError = APIError(statusCode: httpResponse.statusCode, detail: detail)
+                        completion(.failure(apiError))
+                    } else {
+                        // FALLBACK: If JSON is invalid or missing (common in 500 errors) any other errors
+                        let genericError = APIError(statusCode: httpResponse.statusCode, detail: "Server error (Code: \(httpResponse.statusCode))")
+                        completion(.failure(genericError))
+                    }
+                    
+                    // CRITICAL: Stop execution here.
+                    return
+                }
+            }
+            
+            // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
+            guard let data = data else {
+                let noDataError = NSError(domain: "Add Camera", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                completion(.failure(noDataError))
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                // Use this if your backend uses
+                let responseData = try decoder.decode(CCTVResponseForUpdateDelete.self, from: data)
+                completion(.success(responseData))
+            } catch {
+                print("Decoding failed: \(error)")
+                if let str = String(data: data, encoding: .utf8) {
+                    print("Raw Response: \(str)")
+                }
+                completion(.failure(error))
+            }
+        }
+    }
+    
     // To update the camera
     func updateCamera(username: String, jwtToken: String, userId: String, cameraToUpdate: CCTV, completion: @escaping (Result<CCTVResponseForUpdateDelete, Error>) -> Void){
         
@@ -180,7 +240,7 @@ class CCTVService {
             
             // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
             guard let data = data else {
-                let noDataError = NSError(domain: "Upadte Camera", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                let noDataError = NSError(domain: "Update Camera", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
                 completion(.failure(noDataError))
                 return
             }

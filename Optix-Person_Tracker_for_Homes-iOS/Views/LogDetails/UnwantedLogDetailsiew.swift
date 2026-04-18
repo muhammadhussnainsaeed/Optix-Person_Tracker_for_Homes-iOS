@@ -11,7 +11,7 @@ struct UnwantedLogDetailsiew: View {
     
     @State var unwantedPersonLogs : [Logs]? = []
     @State var unwantedPerson: Logs
-    let baseURL: String = "http://192.168.100.8:8000/"
+    let baseURL: String = "http://192.168.100.8:8080/"
     
     @StateObject var alertsViewModelObject = AlertsViewModel()
     

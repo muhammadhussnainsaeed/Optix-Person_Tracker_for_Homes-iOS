@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct FamilyMemberLogListView: View {
     @StateObject var familyViewModelObject = FamilyViewModel()

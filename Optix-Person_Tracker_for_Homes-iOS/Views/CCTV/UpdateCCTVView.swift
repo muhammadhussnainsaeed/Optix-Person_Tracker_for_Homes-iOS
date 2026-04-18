@@ -26,6 +26,8 @@ struct UpdateCCTVView: View {
     
     @StateObject var cctvViewModelObject = CCTVViewModel()
     
+    var onSave: ((UUID, String) -> Void)?
+    
     var body: some View {
         NavigationStack{
             ScrollView {
@@ -92,32 +94,51 @@ struct UpdateCCTVView: View {
                     
                     HStack(alignment: .center) {
                         
-                        PrimaryButton(buttonText: isUpdate ? "Update" : "Save", buttonTextColor: .black, buttonColor: "custom_yellow", action: {
-                            Task{
-                                await cctvViewModelObject.updateCamera(cctvObjectForUpadte: CCTV(id: cameraId, name: name, location: location, cctvDescription: description, videoURL: videoFeedURL, isPrivate: isPrivate, floorId: floorId))
-                                if (cctvViewModelObject.errorMessage != nil){
-                                    alertMessage = cctvViewModelObject.errorMessage ?? ""
-                                    error.toggle()
-                                    isPresentAlert.toggle()
+                        PrimaryButton(buttonText: isUpdate ? "Update" : "Add", buttonTextColor: .black, buttonColor: "custom_yellow", action: {
+                            if isUpdate{
+                                Task{
+                                    await cctvViewModelObject.updateCamera(cctvObjectForUpadte: CCTV(id: cameraId, name: name, location: location, cctvDescription: description, videoURL: videoFeedURL, isPrivate: isPrivate, floorId: floorId))
+                                    if (cctvViewModelObject.errorMessage != nil){
+                                        alertMessage = cctvViewModelObject.errorMessage ?? ""
+                                        error.toggle()
+                                        isPresentAlert.toggle()
+                                    }
+                                    else{
+                                        alertMessage = cctvViewModelObject.cctvResponseForCamera?.message ?? ""
+                                        isPresentAlert.toggle()
+                                     }
                                 }
-                                else{
-                                    alertMessage = cctvViewModelObject.cctvResponseForCamera?.message ?? ""
-                                    isPresentAlert.toggle()
-                                 }
                             }
-
+                            else {
+                                Task{
+                                    await cctvViewModelObject.createCamera(cctvObjectForUpadte: CCTV(id: cameraId, name: name, location: location, cctvDescription: description, videoURL: videoFeedURL, isPrivate: isPrivate, floorId: floorId))
+                                    if (cctvViewModelObject.errorMessage != nil){
+                                        alertMessage = cctvViewModelObject.errorMessage ?? ""
+                                        error.toggle()
+                                        isPresentAlert.toggle()
+                                    }
+                                    else{
+                                        alertMessage = cctvViewModelObject.cctvResponseForCamera?.message ?? ""
+                                        cameraId = cctvViewModelObject.cctvResponseForCamera?.id ?? UUID()
+                                        isPresentAlert.toggle()
+                                    }
+                                }
+                            }
                         }, isLoading: cctvViewModelObject.isLoading)
                     }
                     Spacer()
                 }
                 .padding(.all, 30)
             }
-            .navigationTitle("Edit CCTV Camera")
+            .navigationTitle(isUpdate ? "Edit CCTV Camera" : "Add CCTV Camera")
             .navigationBarTitleDisplayMode(.inline)
         }
         .alert(error ? "Error" : "Success", isPresented: $isPresentAlert) {
             Button("OK", role: .cancel) {
                 if !error {
+                    if !isUpdate{
+                        onSave?(cameraId, name)
+                    }
                     dismiss()
                 }
 

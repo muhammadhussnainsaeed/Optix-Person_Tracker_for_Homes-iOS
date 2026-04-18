@@ -68,7 +68,7 @@ struct NetworkVideoPlayer: View {
 }
 
 #Preview {
-    NetworkVideoPlayer(videoURL: URL(string: "http://192.168.100.8:8000/media/snapshots/snapshot_family.mp4")!)
+    NetworkVideoPlayer(videoURL: URL(string: "http://192.168.100.121:8888/media/snapshots/snapshot_family.mp4")!)
         .frame(maxWidth: .infinity)
         .frame(height: 180)
         .background(Color.black)
