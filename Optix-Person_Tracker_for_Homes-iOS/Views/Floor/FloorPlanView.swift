@@ -18,7 +18,7 @@ struct FloorPlanView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var floorViewModelObject = FloorViewModel()
     // We use the exact same editor URL, because the JS setViewerMode() function will lock it
-    let serverURL = URL(string: "http://192.168.100.8:8888/editor")!
+    let serverURL = URL(string: "http://192.168.0.101:8888/editor")!
     
     var body: some View {
         ZStack {
@@ -79,34 +79,10 @@ struct FloorPlanView: View {
         // 3. Inject data safely when the page is loaded
         .onChange(of: webBridge.isPageLoaded) { oldValue, newValue in
             if newValue == true {
-                injectDataAndLockCanvas()
+                webBridge.injectDataAndLockCanvas(floorPlanData: floorPlanData)
             }
         }
     }
-    
-    private func injectDataAndLockCanvas() {
-            guard !floorPlanData.isEmpty else {
-                print("⚠️ No JSON data provided to viewer.")
-                return
-            }
-            
-            // Sanitize the JSON string so it doesn't break JavaScript syntax
-            let safeJSON = floorPlanData
-                .replacingOccurrences(of: "\\", with: "\\\\") // Escape existing backslashes first
-                .replacingOccurrences(of: "'", with: "\\'")   // Escape single quotes
-                .replacingOccurrences(of: "\n", with: "")     // Strip newlines
-                .replacingOccurrences(of: "\r", with: "")     // Strip carriage returns
-            
-            // 1. Load the data using the function we built in JS
-            let loadCommand = "loadFromJSON('\(safeJSON)');"
-            webBridge.evaluateJS(loadCommand)
-            
-            // 2. Immediately lock the canvas into viewer mode (removes tools & transformer)
-            let lockCommand = "setViewerMode();"
-            webBridge.evaluateJS(lockCommand)
-            
-            print("✅ Successfully injected and locked floor plan: \(floorTitle)")
-        }
 }
 
 #Preview {

@@ -133,6 +133,126 @@ class FloorService {
             }
         }
     }
+
+    // Used to update a floor plan
+    func updateFloor(username: String, jwtToken: String, userId: String, title: String, description: String, floorId: String, completion: @escaping (Result<addUpdateFloorResponse, Error>) -> Void){
+        
+        let credentials: [String: Any] = ["user_id": userId, "username": username, "floor_id": floorId, "title": title, "description": description, "jwt_token": jwtToken]
+        
+        NetworkManager.shared.request(url: "/floor/update", method: "put", body: credentials) {
+            data, response, error in
+            
+            if let error = error {
+                print("Network failed: \(error)")
+                completion(.failure(error))
+                return
+            }
+            
+            // Check HTTP Status Code
+            if let httpResponse = response as? HTTPURLResponse {
+                
+                // If status is NOT success (e.g., 400, 401, 500)
+                if !(200...299).contains(httpResponse.statusCode) {
+                    
+                    // Attempt to decode the specific "detail" from the backend
+                    if let data = data,
+                       let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let detail = errorJson["detail"] as? String {
+                        
+                        let apiError = APIError(statusCode: httpResponse.statusCode, detail: detail)
+                        completion(.failure(apiError))
+                    } else {
+                        // FALLBACK: If JSON is invalid or missing (common in 500 errors) any other errors
+                        let genericError = APIError(statusCode: httpResponse.statusCode, detail: "Server error (Code: \(httpResponse.statusCode))")
+                        completion(.failure(genericError))
+                    }
+                    
+                    // CRITICAL: Stop execution here.
+                    return
+                }
+            }
+            
+            // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
+            guard let data = data else {
+                let noDataError = NSError(domain: "Create Floor", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                completion(.failure(noDataError))
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                // Use this if your backend uses
+                let responseData = try decoder.decode(addUpdateFloorResponse.self, from: data)
+                completion(.success(responseData))
+            } catch {
+                print("Decoding failed: \(error)")
+                if let str = String(data: data, encoding: .utf8) {
+                    print("Raw Response: \(str)")
+                }
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    // Used to delete a floor plan
+    func deleteFloor(username: String, jwtToken: String, userId: String, floorId: String, completion: @escaping (Result<addUpdateFloorResponse, Error>) -> Void){
+        
+        let credentials: [String: Any] = ["user_id": userId, "username": username, "floor_id": floorId, "jwt_token": jwtToken]
+        
+        NetworkManager.shared.request(url: "/floor/delete", method: "delete", body: credentials) {
+            data, response, error in
+            
+            if let error = error {
+                print("Network failed: \(error)")
+                completion(.failure(error))
+                return
+            }
+            
+            // Check HTTP Status Code
+            if let httpResponse = response as? HTTPURLResponse {
+                
+                // If status is NOT success (e.g., 400, 401, 500)
+                if !(200...299).contains(httpResponse.statusCode) {
+                    
+                    // Attempt to decode the specific "detail" from the backend
+                    if let data = data,
+                       let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let detail = errorJson["detail"] as? String {
+                        
+                        let apiError = APIError(statusCode: httpResponse.statusCode, detail: detail)
+                        completion(.failure(apiError))
+                    } else {
+                        // FALLBACK: If JSON is invalid or missing (common in 500 errors) any other errors
+                        let genericError = APIError(statusCode: httpResponse.statusCode, detail: "Server error (Code: \(httpResponse.statusCode))")
+                        completion(.failure(genericError))
+                    }
+                    
+                    // CRITICAL: Stop execution here.
+                    return
+                }
+            }
+            
+            // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
+            guard let data = data else {
+                let noDataError = NSError(domain: "Delete Floor", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                completion(.failure(noDataError))
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                // Use this if your backend uses
+                let responseData = try decoder.decode(addUpdateFloorResponse.self, from: data)
+                completion(.success(responseData))
+            } catch {
+                print("Decoding failed: \(error)")
+                if let str = String(data: data, encoding: .utf8) {
+                    print("Raw Response: \(str)")
+                }
+                completion(.failure(error))
+            }
+        }
+    }
     
     // Used to create a floor plan data
     func createFloorPlan(username: String, jwtToken:String, userId: String, floorId: String, planData: String, completion: @escaping (Result<addUpdateFloorPlanResponse, Error>) -> Void){
@@ -182,6 +302,75 @@ class FloorService {
             // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
             guard let data = data else {
                 let noDataError = NSError(domain: "Create Floor Plan Data", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                completion(.failure(noDataError))
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                // Use this if your backend uses
+                let responseData = try decoder.decode(addUpdateFloorPlanResponse.self, from: data)
+                completion(.success(responseData))
+            } catch {
+                print("Decoding failed: \(error)")
+                if let str = String(data: data, encoding: .utf8) {
+                    print("Raw Response: \(str)")
+                }
+                completion(.failure(error))
+            }
+            
+        }
+        
+    }
+    
+    // Used to update a floor plan data
+    func updateFloorPlan(username: String, jwtToken:String, userId: String, floorId: String, planData: String, completion: @escaping (Result<addUpdateFloorPlanResponse, Error>) -> Void){
+        
+        guard let konvaData = planData.data(using: .utf8),
+              let planDataDict = try? JSONSerialization.jsonObject(with: konvaData, options: []) as? [String: Any] else {
+            print("Failed to parse Konva JSON")
+            //print(konvaData)
+            return
+        }
+        
+        let credentials: [String: Any] = ["user_id": userId, "username": username, "floor_id": floorId, "jwt_token": jwtToken, "plan_data": planDataDict]
+        
+        NetworkManager.shared.request(url: "/floor/update_floor_data", method: "put", body: credentials) {
+            data, response, error in
+            
+            if let error = error {
+                print("Network failed: \(error)")
+                completion(.failure(error))
+                return
+            }
+            
+            // Check HTTP Status Code
+            if let httpResponse = response as? HTTPURLResponse {
+                
+                // If status is NOT success (e.g., 400, 401, 500)
+                if !(200...299).contains(httpResponse.statusCode) {
+                    
+                    // Attempt to decode the specific "detail" from the backend
+                    if let data = data,
+                       let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let detail = errorJson["detail"] as? String {
+                        
+                        let apiError = APIError(statusCode: httpResponse.statusCode, detail: detail)
+                        completion(.failure(apiError))
+                    } else {
+                        // FALLBACK: If JSON is invalid or missing (common in 500 errors) any other errors
+                        let genericError = APIError(statusCode: httpResponse.statusCode, detail: "Server error (Code: \(httpResponse.statusCode))")
+                        completion(.failure(genericError))
+                    }
+                    
+                    // CRITICAL: Stop execution here.
+                    return
+                }
+            }
+            
+            // Handle Data Decoding (Only runs if Status Code was 200 or any other other success code)
+            guard let data = data else {
+                let noDataError = NSError(domain: "Update Floor Plan Data", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received"])
                 completion(.failure(noDataError))
                 return
             }

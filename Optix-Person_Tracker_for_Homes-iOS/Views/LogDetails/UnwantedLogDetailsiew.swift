@@ -40,6 +40,7 @@ struct UnwantedLogDetailsiew: View {
                     }
                     else{
                         NetworkVideoPlayer(videoURL: URL(string: baseURL)!.appendingPathComponent(unwantedPerson.snapshotURL ?? ""))
+                            .id(unwantedPerson.id)
                             .aspectRatio(16/9, contentMode: .fit)
                             .frame(maxWidth: .infinity)
                             .frame(height: 180)
@@ -137,7 +138,7 @@ struct UnwantedLogDetailsiew: View {
                 .padding(.bottom)
             }
             .scrollIndicators(.hidden)
-            .navigationTitle("Family Log Details")
+            .navigationTitle("Unwanted Log Details")
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear(){

@@ -64,4 +64,53 @@ class WebBridge: NSObject, ObservableObject, WKScriptMessageHandler, WKNavigatio
             // TODO: Use URLSession here to POST jsonString to your FastAPI backend
         }
     }
+    
+    
+    // Receives the floor plan data and view only
+    func injectDataAndLockCanvas(floorPlanData: String) {
+            guard !floorPlanData.isEmpty else {
+                print("⚠️ No JSON data provided to viewer.")
+                return
+            }
+            
+            // Sanitize the JSON string so it doesn't break JavaScript syntax
+            let safeJSON = floorPlanData
+                .replacingOccurrences(of: "\\", with: "\\\\") // Escape existing backslashes first
+                .replacingOccurrences(of: "'", with: "\\'")   // Escape single quotes
+                .replacingOccurrences(of: "\n", with: "")     // Strip newlines
+                .replacingOccurrences(of: "\r", with: "")     // Strip carriage returns
+            
+            // 1. Load the data using the function we built in JS
+            let loadCommand = "loadFromJSON('\(safeJSON)');"
+            evaluateJS(loadCommand)
+            
+            // 2. Immediately lock the canvas into viewer mode (removes tools & transformer)
+            let lockCommand = "setViewerMode();"
+            evaluateJS(lockCommand)
+            
+            print("✅ Successfully injected and locked floor plan")
+        }
+    
+    // Receives the floor plan data and can edit
+    func injectData(floorPlanData: String) {
+            guard !floorPlanData.isEmpty else {
+                print("⚠️ No JSON data provided to viewer.")
+                return
+            }
+            
+            // Sanitize the JSON string so it doesn't break JavaScript syntax
+            let safeJSON = floorPlanData
+                .replacingOccurrences(of: "\\", with: "\\\\") // Escape existing backslashes first
+                .replacingOccurrences(of: "'", with: "\\'")   // Escape single quotes
+                .replacingOccurrences(of: "\n", with: "")     // Strip newlines
+                .replacingOccurrences(of: "\r", with: "")     // Strip carriage returns
+            
+            // 1. Load the data using the function we built in JS
+            let loadCommand = "loadFromJSON('\(safeJSON)');"
+            evaluateJS(loadCommand)
+            
+            print("✅ Successfully injected")
+        }
+    
+    
 }

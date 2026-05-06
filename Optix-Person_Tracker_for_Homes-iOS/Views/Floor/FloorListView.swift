@@ -14,6 +14,12 @@ struct FloorListView: View {
     @StateObject var floorViewModelObject = FloorViewModel()
     @State var floorObjectForDetails: Floor?
     @State private var isShowingAddFloorSheet = false
+    @State private var showDeleteAlert = false
+    @State private var floorToDelete : Floor?
+    @State private var floorToUpdate : Floor?
+    @State private var isPresentAlert : Bool = false
+    @State private var alertMessage : String = ""
+    @State private var error: Bool = false
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -69,6 +75,22 @@ struct FloorListView: View {
                             ) {
                                 print("Tapped \(floor.title)")
                                 floorObjectForDetails = floor
+                            }
+                            .contextMenu {
+                                Button {
+                                    print("Edit Tapped")
+                                    floorToUpdate = floor
+                                } label: {
+                                    Text("Edit")
+                                }
+                                
+                                Button(role: .destructive) {
+                                    print("Delete Tapped")
+                                    showDeleteAlert.toggle()
+                                    floorToDelete = floor
+                                } label: {
+                                    Text("Delete")
+                                }
                             }
                         }
                         .padding(.horizontal, 30)
@@ -151,6 +173,40 @@ struct FloorListView: View {
             AddUpdateFloorView(isUpdate: false)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.height(500)])
+        }
+        .sheet(item: $floorToUpdate) { floor in
+            AddUpdateFloorView(isUpdate: true, floorId: floor.id, title: floor.title, description: floor.description)
+                .presentationDragIndicator(.visible)
+        }
+        .alert("Delete Floor?", isPresented: $showDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                if let floor = floorToDelete {
+                    Task{
+                        await floorViewModelObject.deleteFloor(floorId: floorToDelete?.id ?? UUID())
+                        if (floorViewModelObject.errorMessage != nil){
+                            alertMessage = floorViewModelObject.errorMessage ?? ""
+                            error = true
+                            isPresentAlert.toggle()
+                        }
+                        else{
+                            alertMessage = floorViewModelObject.addUpdateFloorResponse?.message ?? ""
+                            isPresentAlert.toggle()
+                         }
+                    }
+                    //print("Deleted \(camera.name)")
+                }
+            }
+        }message: {
+                    Text("Are you sure you want to delete this Floor? Logs, Cameras and their associated data will also be deleted and this action cannot be undone.")
+        }
+        .alert(error ? "Error" : "Success", isPresented: $isPresentAlert) {
+            Button("OK", role: .cancel) {
+                //print("Okay")
+                error = false
+            }
+        } message: {
+            Text(alertMessage)
         }
     }
 }

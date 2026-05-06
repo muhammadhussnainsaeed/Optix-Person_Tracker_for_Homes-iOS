@@ -23,6 +23,7 @@ struct AddUpdateFloorView: View {
     @State var error: Bool = false
     
     @State var isShowingFloorPlanSheet: Bool = false
+    @State var isShowingFloorPlanUpdateSheet: Bool = false
     
     var body: some View {
         NavigationStack{
@@ -55,16 +56,26 @@ struct AddUpdateFloorView: View {
                     HStack(alignment: .center) {
                         
                         PrimaryButton(buttonText: "Next", buttonTextColor: .black, buttonColor: "custom_yellow", action: {
+                            if title.isEmpty || description.isEmpty{
+                                error = true
+                                alertMessage = "Please enter all the fields"
+                                isPresentAlert.toggle()
+                                return
+                            }
                             if isUpdate{
-                                print("update")
+                                Task{
+                                    await floorViewModelObject.updateFloor(floorId: floorId, title: title, description: description)
+                                    if (floorViewModelObject.errorMessage != nil){
+                                        alertMessage = floorViewModelObject.errorMessage ?? ""
+                                        error.toggle()
+                                        isPresentAlert.toggle()
+                                    }
+                                    else{
+                                        isShowingFloorPlanUpdateSheet.toggle()
+                                    }
+                                }
                             }
                             else{
-                                if title.isEmpty || description.isEmpty{
-                                    error = true
-                                    alertMessage = "Please enter all the fields"
-                                    isPresentAlert.toggle()
-                                    return
-                                }
                                 Task{
                                     await floorViewModelObject.createFloor(title: title, description: description)
                                     if (floorViewModelObject.errorMessage != nil){
@@ -89,7 +100,14 @@ struct AddUpdateFloorView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .sheet(isPresented: $isShowingFloorPlanSheet) {
-            AddUpdateFloorPlanView(floorId: UUID(uuidString: floorViewModelObject.addUpdateFloorResponse!.id) ?? UUID(), floorTitle:  floorViewModelObject.addUpdateFloorResponse!.title, onDismissAll: {
+            AddUpdateFloorPlanView(floorId: UUID(uuidString: floorViewModelObject.addUpdateFloorResponse!.id) ?? UUID(), floorTitle:  floorViewModelObject.addUpdateFloorResponse!.title,
+                isUpdate: false, onDismissAll: {
+                dismissRoot()
+            })
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $isShowingFloorPlanUpdateSheet) {
+            AddUpdateFloorPlanView(floorId: floorId, floorTitle: title, isUpdate: true, onDismissAll: {
                 dismissRoot()
             })
                 .presentationDragIndicator(.visible)

@@ -145,6 +145,79 @@ class FloorViewModel: ObservableObject {
         }
     }
     
+    // Updating the new Floor
+    func updateFloor(floorId: UUID, title: String, description: String) async {
+        
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                floorServiceObject.updateFloor(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "",
+                    title: title, description: description, floorId: floorId.uuidString){ result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+
+            self.addUpdateFloorResponse = fetchedData
+
+//            // 1. UPDATE LIST: Use the fresh API data immediately
+//            if let familymember = fetchedData.familyMemberList {
+//                self.familyMemberList = familymember
+//            }
+
+            self.isLoading = false
+           //self.cacheData(context: context, response: fetchedData)
+            //print("D")
+
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+
+            // Fallback is already handled by the initial loadFromCache
+        }
+    }
+    
+    // Deleting the new Floor
+    func deleteFloor(floorId: UUID) async {
+        
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                floorServiceObject.deleteFloor(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", floorId: floorId.uuidString){ result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+
+            self.addUpdateFloorResponse = fetchedData
+
+//            // 1. UPDATE LIST: Use the fresh API data immediately
+//            if let familymember = fetchedData.familyMemberList {
+//                self.familyMemberList = familymember
+//            }
+
+            self.isLoading = false
+           //self.cacheData(context: context, response: fetchedData)
+            //print("D")
+
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
+
+            // Fallback is already handled by the initial loadFromCache
+        }
+    }
+    
     // Creating the floor plan data
     func createFloorData(planData: String, floorId: UUID) async {
         
@@ -163,22 +236,40 @@ class FloorViewModel: ObservableObject {
             }
 
             self.addUpdateFloorPlanResponse = fetchedData
-
-//            // 1. UPDATE LIST: Use the fresh API data immediately
-//            if let familymember = fetchedData.familyMemberList {
-//                self.familyMemberList = familymember
-//            }
-
             self.isLoading = false
-           //self.cacheData(context: context, response: fetchedData)
-            //print("D")
 
         } catch {
             print("API Error: \(error.localizedDescription)")
             self.errorMessage = error.localizedDescription
             self.isLoading = false
 
-            // Fallback is already handled by the initial loadFromCache
+        }
+    }
+
+    // Updating the floor plan data
+    func updateFloorData(planData: String, floorId: UUID) async {
+        
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            let fetchedData = try await withCheckedThrowingContinuation { continuation in
+                
+                floorServiceObject.updateFloorPlan(username: SessionManager.shared.currentUsername, jwtToken: SessionManager.shared.getAuthToken() ?? "", userId: SessionManager.shared.currentUserID?.uuidString ?? "", floorId: floorId.uuidString, planData: planData){ result in
+                    switch result {
+                    case .success(let data): continuation.resume(returning: data)
+                    case .failure(let error): continuation.resume(throwing: error)
+                    }
+                }
+            }
+
+            self.addUpdateFloorPlanResponse = fetchedData
+            self.isLoading = false
+
+        } catch {
+            print("API Error: \(error.localizedDescription)")
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
         }
     }
     

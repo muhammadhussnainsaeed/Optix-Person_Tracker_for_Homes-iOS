@@ -16,6 +16,8 @@ struct AddUpdateFloorPlanView: View {
     @State var isAddCamera: Bool = false
     var floorId: UUID
     var floorTitle: String
+    var isUpdate: Bool
+    @State var floorPlanData: String = ""
     // UI State
     @State private var showingCameraForm = false
     @State private var cameraName = ""
@@ -31,7 +33,7 @@ struct AddUpdateFloorPlanView: View {
     @Environment(\.dismiss) var dismiss
     
     // Replace with your actual Mac/Server IP
-    let serverURL = URL(string: "http://192.168.100.8:8888/editor")!
+    let serverURL = URL(string: "http://192.168.0.101:8888/editor")!
     
     var body: some View {
         ZStack {
@@ -58,18 +60,35 @@ struct AddUpdateFloorPlanView: View {
                             isAddCamera = true
                         }
                         else{
-                            Task{
-                                await floorViewModelObject.createFloorData(planData: webBridge.latestJSON, floorId: floorId)
-                                if (floorViewModelObject.errorMessage != nil){
-                                    alertMessage = floorViewModelObject.errorMessage ?? ""
-                                    error.toggle()
-                                    isPresentAlert.toggle()
-                                }
-                                else{
-                                    alertMessage = floorViewModelObject.addUpdateFloorPlanResponse?.message ?? ""
-                                    isPresentAlert.toggle()
+                            if isUpdate{
+                                Task{
+                                    await floorViewModelObject.updateFloorData(planData: webBridge.latestJSON, floorId: floorId)
+                                    if (floorViewModelObject.errorMessage != nil){
+                                        alertMessage = floorViewModelObject.errorMessage ?? ""
+                                        error.toggle()
+                                        isPresentAlert.toggle()
+                                    }
+                                    else{
+                                        alertMessage = floorViewModelObject.addUpdateFloorPlanResponse?.message ?? ""
+                                        isPresentAlert.toggle()
+                                    }
                                 }
                             }
+                            else{
+                                Task{
+                                    await floorViewModelObject.createFloorData(planData: webBridge.latestJSON, floorId: floorId)
+                                    if (floorViewModelObject.errorMessage != nil){
+                                        alertMessage = floorViewModelObject.errorMessage ?? ""
+                                        error.toggle()
+                                        isPresentAlert.toggle()
+                                    }
+                                    else{
+                                        alertMessage = floorViewModelObject.addUpdateFloorPlanResponse?.message ?? ""
+                                        isPresentAlert.toggle()
+                                    }
+                                }
+                            }
+                            
                             onDismissAll()
                         }
                         
@@ -92,10 +111,6 @@ struct AddUpdateFloorPlanView: View {
             
             VStack {
                 Spacer()
-                
-                // 2. Add Camera Button (Floating above bottom bar)
-                
-                
                 
                 if isAddCamera{
                     
@@ -143,6 +158,19 @@ struct AddUpdateFloorPlanView: View {
                 
             }
             .padding(.bottom, 30)
+        }
+        .onChange(of: webBridge.isPageLoaded) { oldValue, newValue in
+            if newValue == true {
+                webBridge.injectData(floorPlanData: floorPlanData)
+            }
+        }
+        .onAppear(){
+            Task{
+                await floorViewModelObject.fetchFloorData(floorId: floorId)
+                if floorViewModelObject.errorMessage == nil {
+                    floorPlanData = floorViewModelObject.floorPlanResponse?.plan ?? ""
+                }
+            }
         }
         .interactiveDismissDisabled()
         .ignoresSafeArea(.all)

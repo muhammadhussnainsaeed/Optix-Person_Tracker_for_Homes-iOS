@@ -23,6 +23,7 @@ struct FamilyView: View {
     @State var memberObjectForDetails: Family?
     @State var memberObjectForUpdate: Family?
     @State var memberObjectForDelete: Family?
+    @State var logObjectForCorrection: Logs?
     
     @Environment(\.modelContext) private var context
     @StateObject var familyViewModelObject = FamilyViewModel()
@@ -107,6 +108,7 @@ struct FamilyView: View {
                             } label: {
                                 Text("Delete")
                             }
+                            
                         }
                         .padding(.horizontal, 30)
                         .padding(.bottom, 7)
@@ -158,6 +160,14 @@ struct FamilyView: View {
                     ForEach(topFamilyMemberLogs) { log in
                         InfoCard(cardType: .familylog, id: log.id, name: log.name, roomName: log.roomName, floorName: log.floorTitle, description: "", detected_date: AppFormatter.shared.getFormattedDate(from: log.detectedAt), detected_time: AppFormatter.shared.getFormattedTime(from: log.detectedAt), photo: log.personPhoto, relationship: "") {
                             familyLogObjectForDetails = log
+                        }
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                print("Wrong Detection?")
+                                logObjectForCorrection = log
+                            } label: {
+                                Text("Wrong Detection?")
+                            }
                         }
                         .padding(.horizontal, 30)
                         .padding(.bottom, 7)
@@ -269,6 +279,11 @@ struct FamilyView: View {
         .sheet(isPresented: $isShowingSheetAddMember, content: {
             AddUpdateFamilyMemberView(isUpdate: false, member: nil)
                 .presentationDragIndicator(.visible)
+        })
+        .sheet(item: $logObjectForCorrection, content: { log in
+            LogCorrectionView(logId: log.id)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.height(350)])
         })
         .onAppear(){
             Task{
