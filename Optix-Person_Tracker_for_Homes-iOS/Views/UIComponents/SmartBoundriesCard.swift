@@ -12,7 +12,7 @@ struct SmartBoundriesCard: View {
     let title: String
     let name: String
     let photo: String
-    @State var isActive: Bool = true
+    let isActive: Bool
     let action: () -> Void
     var body: some View {
         Button {

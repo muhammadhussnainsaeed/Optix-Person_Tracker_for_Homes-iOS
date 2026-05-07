@@ -13,6 +13,7 @@ struct FamilyView: View {
     @State var isShowingSheetFamilyList: Bool = false
     @State var isShowingSheetFamilyLogsList: Bool = false
     @State var isShowingSheetAddMember: Bool = false
+    @State var isShowingSheetRules: Bool = false
     
     @State private var showDeleteAlert = false
     @State private var isPresentAlert : Bool = false
@@ -189,8 +190,7 @@ struct FamilyView: View {
                             .bold()
                         Spacer()
                         Button {
-                            //isShowingSheetFloor = true
-                            print("Map")
+                            isShowingSheetRules = true
                         } label: {
                             Label("Smart Boundaries", systemImage: "heart.text.square.fill")
                         }
@@ -294,6 +294,10 @@ struct FamilyView: View {
             LogCorrectionView(logId: log.id)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.height(350)])
+        })
+        .navigationDestination(isPresented: $isShowingSheetRules, destination: {
+            SmartBoundariesView()
+                .navigationBarBackButtonHidden()
         })
         .onAppear(){
             Task{
