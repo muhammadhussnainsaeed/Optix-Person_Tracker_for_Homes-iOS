@@ -231,7 +231,7 @@ struct NetworkStreamPlayer: View {
 // Internal Engine (No changes needed here)
 struct StreamWebView: UIViewRepresentable {
     let urlString: String?
-    let baseURL = "http://192.168.100.121:8888/"
+    let baseURL = "http://192.168.100.221:8888/"
     
     func makeUIView(context: Context) -> WKWebView {
         let webConfiguration = WKWebViewConfiguration()

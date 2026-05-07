@@ -188,6 +188,16 @@ struct FamilyView: View {
                             .font(.title)
                             .bold()
                         Spacer()
+                        Button {
+                            //isShowingSheetFloor = true
+                            print("Map")
+                        } label: {
+                            Label("Smart Boundaries", systemImage: "heart.text.square.fill")
+                        }
+                        .foregroundStyle(Color.white)
+                        .padding(.vertical, 5)
+                        .buttonStyle(.glassProminent)
+                        .tint(Color("custom_blue"))
                     }
                 }
                 .padding(.top, 60)

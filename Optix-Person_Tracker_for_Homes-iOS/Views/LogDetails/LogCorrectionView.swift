@@ -10,7 +10,10 @@ import SwiftUI
 struct LogCorrectionView: View {
     let logId : UUID
     @State var personId: UUID?
+    @State var isNewPerson: Bool = true
     @StateObject var logViewModelObject = LogViewModel()
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
         NavigationStack {
             Form {
@@ -53,6 +56,16 @@ struct LogCorrectionView: View {
                     
                     PrimaryButton(buttonText: "Update", buttonTextColor: .black, buttonColor: "custom_yellow", action: {
                         print("button press")
+                        if (personId != nil) {
+                            isNewPerson = false
+                        }
+                        Task{
+                            await logViewModelObject.personLogCorrection(eventId: logId, isNewPerson: isNewPerson, personId: personId)
+                            if logViewModelObject.logCorrectionResponse?.status == "success"{
+                                dismiss()
+                            }
+                            
+                        }
                     }, isLoading: false)
                     
                 }

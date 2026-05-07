@@ -174,7 +174,6 @@ struct CCTVView: View {
                         Spacer()
                         Button {
                             isShowingSheetFloor = true
-                            print("Map")
                         } label: {
                             Label("Floor Plan", systemImage: "map.fill")
                         }

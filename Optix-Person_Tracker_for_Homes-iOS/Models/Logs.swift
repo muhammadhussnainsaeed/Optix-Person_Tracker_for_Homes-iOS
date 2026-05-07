@@ -52,3 +52,12 @@ struct LogsResponse : Codable {
         case logs
     }
 }
+
+struct LogCorrectionResponse : Codable {
+    let status: String
+    let message: String
+    
+    enum CodingKeys: String, CodingKey {
+        case status, message
+    }
+}
