@@ -14,6 +14,7 @@ struct MonitoringRule: Codable, Identifiable {
     let toTime: String?
     let isActive: Bool
     let personName: String
+    let personId: String
     let photo: String
     let cameras: [CamerasObject]?
     
@@ -24,6 +25,7 @@ struct MonitoringRule: Codable, Identifiable {
         case toTime = "to_time"
         case isActive = "is_active"
         case personName = "person_name"
+        case personId = "person_id"
         case photo = "person_photo_url"
         case cameras
     }
@@ -46,5 +48,27 @@ struct MonitoringRuleResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case message
         case rules
+    }
+}
+
+struct UpdateDeleteMonitoringRuleResponse: Codable {
+    let message: String
+    let ruleId: String
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+        case ruleId = "rule_id"
+    }
+}
+
+struct FetchRuleCamerasResponse: Codable {
+    let message: String
+    let linkedCameras: [CamerasObject]
+    let unlinkedCameras: [CamerasObject]
+    
+    enum CodingKeys: String, CodingKey {
+        case message
+        case linkedCameras = "linked_cameras"
+        case unlinkedCameras = "unlinked_cameras"
     }
 }

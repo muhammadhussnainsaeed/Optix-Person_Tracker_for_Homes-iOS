@@ -22,52 +22,29 @@ struct ListCard: View {
     let photo: String
     var body: some View {
         HStack{
-            if cardType == .family{
-                VStack{
-                    HStack{
-                        Text("\(name)")
-                        //.font(.caption)
-                        Spacer()
-                    }
-                    //Spacer()
-                    HStack{
-                        Text("\(relationship)")
-                            .foregroundStyle(Color.secondary)
-                            .font(.caption)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
-                        Spacer()
-                    }
-                }
-                .padding(.horizontal, 10)
-            }
-            else{
-                HStack(spacing: 15) {
-                    // Optimized Image Loading
-                    ImageView(urlString: photo, localImage: nil)
-                        .frame(width: 60, height: 60)
-                        .cornerRadius(13)
+            HStack(spacing: 15) {
+                // Optimized Image Loading
+                ImageView(urlString: photo, localImage: nil)
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(13)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(name)
+                        .font(.headline)
+                        .foregroundColor(.primary)
                     
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(name)
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        
-                        // Show relationship for Family, otherwise show the type (Unwanted/Guest)
-                        Text(cardType == .family ? relationship : type)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .textCase(.uppercase)
-                    }
-                    Spacer()
+                    // Show relationship for Family, otherwise show the type (Unwanted/Guest)
+                    Text(cardType == .family ? relationship : type)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .textCase(.uppercase)
                 }
+                Spacer()
             }
-            //.padding(12)
         }
     }
 }
 
 #Preview {
-    ListCard(cardType: .all, id: UUID(), name: "Ali Khan", relationship: "Father", type: "Family", photo: "")
+    ListCard(cardType: .family, id: UUID(), name: "Ali Khan", relationship: "Father", type: "Family", photo: "")
 }

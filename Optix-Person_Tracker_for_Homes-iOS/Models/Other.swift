@@ -34,3 +34,24 @@ struct AllPersonsList: Codable{
     
 }
 
+// Represents a single family member returned from the DB
+struct FamilyMemberData: Codable, Identifiable {
+    let id: String
+    let name: String
+    let relationship: String
+    let photo: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case relationship
+        case photo = "primary_photo"
+    }
+}
+
+// Represents the root response object
+struct GetAllFamilyResponse: Codable {
+    let message: String
+    let data: [FamilyMemberData]
+}
+

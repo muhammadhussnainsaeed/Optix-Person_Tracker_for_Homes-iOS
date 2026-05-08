@@ -53,7 +53,7 @@ struct SmartBoundriesCard: View {
                             
                             .font(.system(size: 7))
                             .scaledToFit()
-                        Text("Active")
+                        Text(isActive ? "Active" :  "Inactive")
                             .font(.caption)
                     }
                     .foregroundStyle(isActive ? Color.green: Color.gray)
