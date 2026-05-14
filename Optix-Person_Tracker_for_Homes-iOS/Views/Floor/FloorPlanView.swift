@@ -18,7 +18,7 @@ struct FloorPlanView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var floorViewModelObject = FloorViewModel()
     // We use the exact same editor URL, because the JS setViewerMode() function will lock it
-    let serverURL = URL(string: "http://192.168.0.101:8888/editor")!
+    let serverURL = URL(string: "http://192.168.31.205:8888/editor")!
     
     var body: some View {
         ZStack {

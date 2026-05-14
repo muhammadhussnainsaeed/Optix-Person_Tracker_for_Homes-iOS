@@ -13,12 +13,18 @@ import SwiftData
 class SessionManager: ObservableObject {
     
     @Environment(\.modelContext) private var context
-    static let shared = SessionManager()
+    static var shared = SessionManager()
     
     // MARK: 1, Login Status
     @Published var isLoggedIn: Bool = UserDefaults.standard.bool(forKey: "isLoggedIn") {
         didSet {
             UserDefaults.standard.set(isLoggedIn, forKey: "isLoggedIn")
+        }
+    }
+    
+    @Published var getNotification: Bool = UserDefaults.standard.bool(forKey: "getNotification") {
+        didSet {
+            UserDefaults.standard.set(getNotification, forKey: "getNotification")
         }
     }
     
@@ -61,6 +67,7 @@ class SessionManager: ObservableObject {
         
         // This triggers the UI update because 'isLoggedIn' is @Published
         self.isLoggedIn = true
+        self.getNotification = true
     }
     
     func getAuthToken() -> String? {

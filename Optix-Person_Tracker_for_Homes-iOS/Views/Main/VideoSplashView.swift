@@ -5,14 +5,6 @@
 //  Created by Hussnain on 17/2/26.
 //
 
-//import SwiftU
-//
-//struct VideoSplashView: View {
-//    var body: some View {
-//        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-//    }
-//}
-
 import SwiftUI
 import AVKit
 
@@ -22,15 +14,9 @@ struct SplashCoverView: View {
     
     var body: some View {
         ZStack {
-            // FIX: Use ternary operator directly for Color
+            
             (colorScheme == .dark ? Color.black : Color.white)
                 .ignoresSafeArea()
-            
-            // The "Element" (The starting shape of your logo)
-            // Adjust this shape to match your video's starting frame exactly!
-//            Circle()
-//                .fill(colorScheme == .dark ? Color.white : Color.black) // Opposite color
-//                .frame(width: 20, height: 20)
         }
     }
 }
@@ -87,7 +73,6 @@ struct VideoSplashView: View {
     }
     
     func setupPlayer() {
-        // Ensure you have "Optix_video_dark" and "Optix_video_light" in your project assets/folder
         // Note: I removed the file extension here so we can check both .mp4 and .mov below
         let videoName = colorScheme == .dark ? "Optix_video_dark" : "Optix_video_light"
         

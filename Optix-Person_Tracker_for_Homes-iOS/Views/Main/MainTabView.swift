@@ -9,11 +9,12 @@ import SwiftUI
 import Combine
 
 struct MainTabView: View {
-    // We store the selected tab here so we can change it programmatically if needed
-    // (e.g., clicking a notification takes you straight to .alerts)
     @State private var selectedTab: AppTab = .home
-    @StateObject var session = SessionManager.shared
     
+    // FIX 1: Use @ObservedObject for a shared singleton instance
+    @ObservedObject var session = SessionManager.shared
+    
+    // This is the ONE global manager for the app
     @StateObject private var notificationManager = NotificationManager()
     
     var body: some View {
@@ -67,25 +68,33 @@ struct MainTabView: View {
             }
             .toolbarBackground(.visible, for: .tabBar)
             .toolbarBackground(.ultraThinMaterial, for: .tabBar)
-            // Optional: Custom Tab Bar Color
             .tint(Color("custom_blue"))
             
+            // BANNER OVERLAY
             if notificationManager.showBanner, let alert = notificationManager.currentAlert {
                 NotificationBanner(packet: alert)
-                    .padding(.top, 16) // Give it breathing room from the dynamic island/notch
+                    .padding(.top, 16)
                     .transition(.move(edge: .top).combined(with: .opacity))
                     .zIndex(1)
             }
         }
         .onAppear {
-            // Assuming your session manager holds the user object or ID
-            // Convert the UUID to a string here using .uuidString
-            if let userUUID = session.currentUserID {
+            // Initial check when app loads
+            if session.getNotification, let userUUID = session.currentUserID {
                 notificationManager.startListening(for: userUUID.uuidString)
             }
         }
-        // Note: Adjust `session.currentUser?.id` to whatever your
-        // SessionManager actually calls its UUID property (e.g., session.userId).
+        // FIX 2: Listen to the SessionManager toggle globally here
+        .onChange(of: session.getNotification) { oldValue, newValue in
+            if newValue {
+                if let userUUID = session.currentUserID {
+                    notificationManager.startListening(for: userUUID.uuidString)
+                }
+            } else {
+                // Instantly kills the websocket app-wide when toggled off
+                notificationManager.stopListening()
+            }
+        }
     }
 }
 

@@ -58,23 +58,8 @@ struct AlertsView: View {
                         }
                         .padding(.horizontal, 30)
                         .padding(.bottom, 7)
-                        //                                            .contextMenu {
-                        //                                                Button {
-                        //                                                    print("Edit Tapped")
-                        //                                                    memberObjectForUpdate = member
-                        //                                                } label: {
-                        //                                                    Text("Edit")
-                        //                                                }
-                        //
-                        //                                                Button(role: .destructive) {
-                        //                                                    print("Delete Tapped")
-                        //                                                    showDeleteAlert.toggle()
-                        //                                                    memberObjectForDelete = member
-                        //                                                } label: {
-                        //                                                    Text("Delete")
-                        //                                                }
-                        //                                            }
                     }
+                    Color.clear.frame(height: 140)
                 }
             }
             .ignoresSafeArea()
